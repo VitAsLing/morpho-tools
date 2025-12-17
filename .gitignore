@@ -10,7 +10,6 @@ dist-ssr
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
-bun.lock
 
 # IDE
 .vscode/*
