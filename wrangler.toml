@@ -1,0 +1,9 @@
+# Cloudflare Workers configuration
+name = "morpho-tools"
+compatibility_date = "2024-12-01"
+
+# Serve static assets from dist directory
+[assets]
+directory = "./dist"
+html_handling = "force-trailing-slash"
+not_found_handling = "single-page-application"
