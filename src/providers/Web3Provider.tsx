@@ -1,7 +1,8 @@
-import { WagmiProvider, http, fallback } from 'wagmi'
+import { WagmiProvider, http, fallback, createConfig } from 'wagmi'
 import { mainnet, base, arbitrum } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
+import { injected, coinbaseWallet } from 'wagmi/connectors'
 import type { ReactNode } from 'react'
 import '@rainbow-me/rainbowkit/styles.css'
 
@@ -14,12 +15,12 @@ const queryClient = new QueryClient({
   },
 })
 
-const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID'
-
-const config = getDefaultConfig({
-  appName: 'Morpho Tools',
-  projectId,
+const config = createConfig({
   chains: [mainnet, base, arbitrum],
+  connectors: [
+    injected(),
+    coinbaseWallet({ appName: 'Morpho Tools' }),
+  ],
   transports: {
     [mainnet.id]: fallback([
       http('https://eth.llamarpc.com'),
