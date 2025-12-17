@@ -8,7 +8,8 @@ export function Header() {
 
   return (
     <header className="border-b border-[var(--border)] bg-[var(--bg-secondary)]">
-      <div className="content-width flex items-center justify-between h-16">
+      {/* Desktop Header */}
+      <div className="content-width hidden md:flex items-center justify-between h-16">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Morpho Tools</h1>
           <button
@@ -71,6 +72,69 @@ export function Header() {
           <ChainSelector />
           <ConnectButton />
         </div>
+      </div>
+
+      {/* Mobile Header */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between px-4 h-14">
+          <h1 className="text-lg font-bold text-[var(--text-primary)]">Morpho Tools</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] cursor-pointer"
+            >
+              {theme === 'dark' ? (
+                <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+            <ChainSelector />
+            <ConnectButton />
+          </div>
+        </div>
+        <nav className="flex items-center justify-center gap-6 border-t border-[var(--border)] px-4">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `py-3 text-sm font-semibold border-b-2 transition-colors ${
+                isActive
+                  ? 'text-[var(--text-primary)] border-[var(--accent)]'
+                  : 'text-[var(--text-secondary)] border-transparent'
+              }`
+            }
+          >
+            Markets
+          </NavLink>
+          <NavLink
+            to="/positions"
+            className={({ isActive }) =>
+              `py-3 text-sm font-semibold border-b-2 transition-colors ${
+                isActive
+                  ? 'text-[var(--text-primary)] border-[var(--accent)]'
+                  : 'text-[var(--text-secondary)] border-transparent'
+              }`
+            }
+          >
+            Positions
+          </NavLink>
+          <NavLink
+            to="/rewards"
+            className={({ isActive }) =>
+              `py-3 text-sm font-semibold border-b-2 transition-colors ${
+                isActive
+                  ? 'text-[var(--text-primary)] border-[var(--accent)]'
+                  : 'text-[var(--text-secondary)] border-transparent'
+              }`
+            }
+          >
+            Rewards
+          </NavLink>
+        </nav>
       </div>
     </header>
   )

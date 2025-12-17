@@ -12,6 +12,7 @@ export function ConnectButton() {
     return (
       <button
         onClick={openConnectModal}
+        className="connect-btn"
         style={{
           backgroundColor: 'var(--bg-tertiary)',
           border: '1px solid var(--text-secondary)',
@@ -22,6 +23,7 @@ export function ConnectButton() {
           fontWeight: 600,
           cursor: 'pointer',
           transition: 'all 0.2s',
+          whiteSpace: 'nowrap',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = 'var(--text-primary)'
@@ -32,7 +34,8 @@ export function ConnectButton() {
           e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
         }}
       >
-        Connect Wallet
+        <span className="hidden md:inline">Connect Wallet</span>
+        <span className="md:hidden">Connect</span>
       </button>
     )
   }
@@ -40,6 +43,7 @@ export function ConnectButton() {
   return (
     <button
       onClick={openAccountModal}
+      className="connected-btn"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -61,6 +65,7 @@ export function ConnectButton() {
         height: '24px',
         borderRadius: '50%',
         background: 'linear-gradient(to bottom right, #3b82f6, #a855f7)',
+        flexShrink: 0,
       }} />
       <span style={{ fontSize: '14px' }}>{formatAddress(address!)}</span>
     </button>

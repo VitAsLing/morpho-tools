@@ -8,7 +8,7 @@ export function Positions() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-[var(--text-primary)]" style={{ marginBottom: '25px' }}>
+      <h1 className="text-3xl font-bold text-[var(--text-primary)] py-2" style={{ marginBottom: '20px' }}>
         Positions
       </h1>
       {!isConnected ? (

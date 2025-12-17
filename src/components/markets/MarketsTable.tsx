@@ -138,20 +138,20 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
 
   return (
     <div>
-      <div className="flex justify-end items-center gap-4" style={{ marginBottom: '10px' }}>
+      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4" style={{ marginBottom: '10px' }}>
         <div className="flex items-center gap-2">
-          <span className="text-base text-[var(--text-secondary)]">Token:</span>
+          <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Token:</span>
           <input
             type="text"
-            placeholder="Search Token..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input text-base"
-            style={{ width: '200px', height: '36px' }}
+            className="input text-sm sm:text-base flex-1 sm:flex-none"
+            style={{ width: '100%', maxWidth: '200px', height: '36px' }}
           />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-base text-[var(--text-secondary)]">Min Supply:</span>
+          <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Min Supply:</span>
           <input
             type="range"
             min="0"
@@ -159,9 +159,9 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
             step="10"
             value={minSupply}
             onChange={(e) => setMinSupply(Number(e.target.value))}
-            className="w-40"
+            className="w-24 sm:w-40"
           />
-          <span className="text-base text-[var(--text-primary)] w-14">${minSupply}M</span>
+          <span className="text-sm sm:text-base text-[var(--text-primary)] w-12 sm:w-14">${minSupply}M</span>
         </div>
       </div>
 
