@@ -2,6 +2,8 @@
 
 A modern web interface for interacting with [Morpho Blue](https://morpho.org/) lending protocol. View markets, manage positions, and track rewards across Ethereum, Base, and Arbitrum.
 
+**Website**: [morpho.not-today.work](https://morpho.not-today.work)
+
 ## Features
 
 - **Markets** - Browse and supply to Morpho Blue lending markets with real-time APY data
