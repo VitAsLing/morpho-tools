@@ -258,20 +258,20 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         rel="noopener noreferrer"
                         className="group flex items-center gap-2"
                       >
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-1.5">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
                             <TokenLogo
                               address={market.loanAsset.address}
                               symbol={market.loanAsset.symbol}
                               logoURI={market.loanAsset.logoURI}
-                              size="md"
+                              size="sm"
                             />
                             <span className="text-[var(--text-primary)] font-medium text-base group-hover:underline">
                               {market.loanAsset.symbol}
                             </span>
                           </div>
                           {market.collateralAsset && (
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-2">
                               <TokenLogo
                                 address={market.collateralAsset.address}
                                 symbol={market.collateralAsset.symbol}
