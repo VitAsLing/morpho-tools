@@ -32,15 +32,15 @@ export function ChainSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-xl px-4 py-3 font-medium text-[var(--text-primary)] cursor-pointer hover:border-[var(--accent)] hover:bg-[var(--bg-tertiary)]/80 transition-colors"
+        className="flex items-center gap-1.5 md:gap-2 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-lg md:rounded-xl px-2.5 md:px-4 py-2 md:py-3 font-medium text-[var(--text-primary)] cursor-pointer hover:border-[var(--accent)] hover:bg-[var(--bg-tertiary)]/80 transition-colors"
       >
         <img
           src={chainLogos[currentChain.id]}
           alt={currentChain.name}
-          className="w-8 h-8 rounded-full"
+          className="w-6 h-6 md:w-8 md:h-8 rounded-full"
         />
         <svg
-          className={`w-5 h-5 text-[var(--text-secondary)] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 md:w-5 md:h-5 text-[var(--text-secondary)] transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ export function ChainSelector() {
                   switchChain({ chainId: chain.id })
                   setIsOpen(false)
                 }}
-                className={`w-full flex items-center gap-3 px-5 py-4 h-10 transition-all cursor-pointer ${
+                className={`w-full flex items-center gap-3 px-4 py-3 transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-[var(--accent)] text-white'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--accent)]/20 hover:text-white'
@@ -69,7 +69,7 @@ export function ChainSelector() {
                 <img
                   src={chainLogos[chain.id]}
                   alt={chain.name}
-                  className="w-7 h-7 rounded-full"
+                  className="w-6 h-6 rounded-full"
                 />
                 <span className="text-base font-medium">{chain.name}</span>
                 {isSelected && (

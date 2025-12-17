@@ -159,10 +159,41 @@ body {
   animation: spin 1s linear infinite;
 }
 
-/* 内容区域宽度 - 左右各 16% 留白 */
+/* 内容区域宽度 - 响应式 */
 .content-width {
   width: 68%;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* 移动端响应式 */
+@media (max-width: 1024px) {
+  .content-width {
+    width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-width {
+    width: 95%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 14px;
+  }
+
+  .modal-content {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+    padding: 1rem;
+  }
+
+  /* 表格在移动端允许水平滚动 */
+  .table-fixed-layout {
+    min-width: 800px;
+  }
 }
 
