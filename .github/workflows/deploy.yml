@@ -11,18 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: bun install --frozen-lockfile
-      - run: bun run type-check
-      - run: bun run lint
-      - run: bun run build
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
       - name: Deploy
         if: github.ref == 'refs/heads/main'
         uses: cloudflare/pages-action@v1
