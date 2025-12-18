@@ -186,6 +186,14 @@ body {
   border-color: var(--accent);
 }
 
+.input-error {
+  border-color: var(--error);
+}
+
+.input-error:focus {
+  border-color: var(--error);
+}
+
 /* 表格固定布局 */
 .table-fixed-layout {
   table-layout: fixed;

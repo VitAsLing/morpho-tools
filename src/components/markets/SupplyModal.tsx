@@ -100,6 +100,17 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
 
   const isValidAmount = parsedAmount > 0n && parsedAmount <= balance
 
+  // 错误提示
+  const getErrorMessage = () => {
+    const trimmed = amount.trim()
+    if (!trimmed) return null
+    // 检查是否是有效数字格式（只允许数字和一个小数点）
+    if (!/^\d*\.?\d*$/.test(trimmed)) return 'Invalid number'
+    if (parsedAmount > balance) return 'Exceeds balance'
+    return null
+  }
+  const errorMessage = getErrorMessage()
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -193,10 +204,10 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
 
         <div style={{ marginTop: '16px' }}>
           <label
-            className="block text-sm text-[var(--text-secondary)]"
+            className={`block text-sm ${errorMessage ? 'text-[var(--error)]' : 'text-[var(--text-secondary)]'}`}
             style={{ marginBottom: '5px', marginTop: '5px' }}
           >
-            Amount
+            Amount {errorMessage && `- ${errorMessage}`}
           </label>
           <div className="relative">
             <input
@@ -204,7 +215,7 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="input pr-24 py-4"
+              className={`input pr-24 py-4 ${errorMessage ? 'input-error' : ''}`}
               disabled={!isConnected}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">

@@ -28,7 +28,11 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
   const parsedAmount = amount
     ? parseTokenAmount(amount, market.loanAsset.decimals)
     : 0n
-  const maxAmount = position.supplyAssets
+  const maxAssets = BigInt(position.supplyAssets)
+  const maxShares = BigInt(position.supplyShares)
+
+  // 判断是否全额提取
+  const isFullWithdraw = parsedAmount >= maxAssets
 
   const marketParams: MarketParams = {
     loanToken: market.loanAsset.address,
@@ -69,7 +73,13 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
 
   const handleWithdraw = async () => {
     try {
-      await withdraw(marketParams, parsedAmount)
+      if (isFullWithdraw) {
+        // 全额提取：用 shares，确保提取所有资产，无残留
+        await withdraw(marketParams, maxShares, true)
+      } else {
+        // 部分提取：用 assets，用户输入多少得到多少
+        await withdraw(marketParams, parsedAmount, false)
+      }
     } catch (error) {
       console.error('Withdraw failed:', error)
     }
@@ -78,14 +88,26 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
   const handleMaxClick = () => {
     setAmount(
       formatTokenAmount(
-        BigInt(maxAmount),
+        maxAssets,
         market.loanAsset.decimals,
         market.loanAsset.decimals
       )
     )
   }
 
-  const isValidAmount = parsedAmount > 0n && parsedAmount <= BigInt(maxAmount)
+  // 验证：金额 > 0 且 <= 最大可提取金额
+  const isValidAmount = parsedAmount > 0n && parsedAmount <= maxAssets
+
+  // 错误提示
+  const getErrorMessage = () => {
+    const trimmed = amount.trim()
+    if (!trimmed) return null
+    // 检查是否是有效数字格式（只允许数字和一个小数点）
+    if (!/^\d*\.?\d*$/.test(trimmed)) return 'Invalid number'
+    if (parsedAmount > maxAssets) return 'Exceeds balance'
+    return null
+  }
+  const errorMessage = getErrorMessage()
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -151,7 +173,7 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
           <div className="flex justify-between">
             <span className="text-[var(--text-secondary)]">Your Supply</span>
             <span className="text-[var(--success)] font-semibold">
-              {formatTokenAmount(BigInt(maxAmount), market.loanAsset.decimals)} {market.loanAsset.symbol}
+              {formatTokenAmount(maxAssets, market.loanAsset.decimals)} {market.loanAsset.symbol}
             </span>
           </div>
           <div className="flex justify-between">
@@ -169,14 +191,16 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
         </div>
 
         <div style={{ marginTop: '16px' }}>
-          <label className="block text-sm text-[var(--text-secondary)]" style={{ marginBottom: '5px', marginTop: '5px' }}>Amount</label>
+          <label className={`block text-sm ${errorMessage ? 'text-[var(--error)]' : 'text-[var(--text-secondary)]'}`} style={{ marginBottom: '5px', marginTop: '5px' }}>
+            Amount {errorMessage && `- ${errorMessage}`}
+          </label>
           <div className="relative">
             <input
               type="text"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="input pr-24 py-4"
+              className={`input pr-24 py-4 ${errorMessage ? 'input-error' : ''}`}
               disabled={!isConnected}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">

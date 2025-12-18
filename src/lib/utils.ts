@@ -45,10 +45,18 @@ export function formatTokenAmount(
 }
 
 export function parseTokenAmount(amount: string, decimals: number): bigint {
-  const [integerPart, fractionalPart = ''] = amount.split('.')
+  // 移除空格
+  const trimmed = amount.trim()
+
+  // 验证输入格式：只允许数字和一个小数点
+  if (!trimmed || !/^\d*\.?\d*$/.test(trimmed)) {
+    return 0n
+  }
+
+  const [integerPart, fractionalPart = ''] = trimmed.split('.')
   const paddedFractional = fractionalPart.padEnd(decimals, '0').slice(0, decimals)
-  const fullNumber = integerPart + paddedFractional
-  return BigInt(fullNumber || '0')
+  const fullNumber = (integerPart || '0') + paddedFractional
+  return BigInt(fullNumber)
 }
 
 export function getTokenLogoUrl(address: Address, logoURI?: string | null): string {
