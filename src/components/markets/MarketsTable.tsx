@@ -124,7 +124,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
     className?: string
   }) => (
     <th
-      className={`px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] ${className}`}
+      className={`px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] ${className}`}
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center gap-1">
@@ -138,18 +138,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4" style={{ marginBottom: '10px' }}>
-        <div className="flex items-center gap-2">
-          <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Token:</span>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input text-sm sm:text-base flex-1 sm:flex-none"
-            style={{ width: '100%', maxWidth: '200px', height: '36px' }}
-          />
-        </div>
+      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4" style={{ height: '36px', marginBottom: '10px' }}>
         <div className="flex items-center gap-2">
           <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Min Supply:</span>
           <input
@@ -169,9 +158,18 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
         <table className="table-fixed-layout">
           <thead className="border-b border-[var(--border)]">
             <tr>
-              <SortHeader field="market" className="w-[180px]">
-                Market
-              </SortHeader>
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[180px] group">
+                <div className="relative h-7 flex items-center">
+                  <span className={`transition-opacity ${searchQuery ? 'opacity-0' : 'group-hover:opacity-0'}`}>Market</span>
+                  <input
+                    type="text"
+                    placeholder="Market"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`absolute inset-0 bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] outline-none text-lg font-semibold transition-opacity ${searchQuery ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                  />
+                </div>
+              </th>
               <SortHeader field="totalSupply" className="w-[120px]">
                 Total Supply
               </SortHeader>
@@ -190,7 +188,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
               <SortHeader field="netApy" className="w-[140px]">
                 Net APY
               </SortHeader>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Action
               </th>
             </tr>
