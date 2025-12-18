@@ -225,7 +225,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                     <td className="px-4 py-5">
                       <button
                         onClick={() => setSelectedPosition(position)}
-                        className="btn btn-secondary text-base py-2 px-4"
+                        className="btn btn-primary text-base py-2 px-4"
                       >
                         Withdraw
                       </button>

@@ -37,7 +37,7 @@ export async function fetchMerklRewards(
   userAddress: string,
   chainId: number
 ): Promise<MerklRewardItem[]> {
-  const url = `${MERKL_API_BASE}/users/${userAddress}/rewards?chainId=${chainId}`
+  const url = `${MERKL_API_BASE}/users/${userAddress.toLowerCase()}/rewards?chainId=${chainId}`
 
   const response = await fetch(url)
 
@@ -58,7 +58,7 @@ export async function fetchMorphoRewards(
   userAddress: string,
   chainId: number
 ): Promise<MorphoReward[]> {
-  const url = `${MORPHO_REWARDS_API_BASE}/users/${userAddress}/rewards?chain_id=${chainId}`
+  const url = `${MORPHO_REWARDS_API_BASE}/users/${userAddress.toLowerCase()}/rewards?chain_id=${chainId}`
 
   const response = await fetch(url)
 
