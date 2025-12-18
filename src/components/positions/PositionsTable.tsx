@@ -13,7 +13,8 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import { formatUsd, formatTokenAmount, formatPercent } from '@/lib/utils'
+import { formatUsd, formatTokenAmount, formatPercent, getMarketUrl } from '@/lib/utils'
+import { getChainConfig } from '@/lib/morpho/constants'
 import { calculateCostBasis, calculateProfit } from '@/lib/transactionStore'
 
 interface PositionsTableProps {
@@ -25,6 +26,7 @@ interface PositionsTableProps {
 export function PositionsTable({ positions, isLoading, error }: PositionsTableProps) {
   const { address } = useAccount()
   const chainId = useChainId()
+  const chainConfig = getChainConfig(chainId)
   const [selectedPosition, setSelectedPosition] = useState<UserPosition | null>(null)
 
   return (
@@ -128,32 +130,44 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                   <TableRow key={market.uniqueKey}>
                     {/* Market */}
                     <TableCell className="py-5">
-                      <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
-                        <div className="flex items-center gap-2">
-                          <TokenLogo
-                            address={market.loanAsset.address}
-                            symbol={market.loanAsset.symbol}
-                            logoURI={market.loanAsset.logoURI}
-                            size="sm"
-                          />
-                          <span className="text-[var(--text-primary)] font-medium text-base">
-                            {market.loanAsset.symbol}
-                          </span>
-                        </div>
-                        {market.collateralAsset && (
+                      <a
+                        href={getMarketUrl(
+                          chainConfig.morphoAppUrl,
+                          market.uniqueKey,
+                          market.loanAsset.symbol,
+                          market.collateralAsset?.symbol ?? 'NONE'
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-2"
+                      >
+                        <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
                           <div className="flex items-center gap-2">
                             <TokenLogo
-                              address={market.collateralAsset.address}
-                              symbol={market.collateralAsset.symbol}
-                              logoURI={market.collateralAsset.logoURI}
+                              address={market.loanAsset.address}
+                              symbol={market.loanAsset.symbol}
+                              logoURI={market.loanAsset.logoURI}
                               size="sm"
                             />
-                            <span className="text-[var(--text-secondary)] text-sm">
-                              {market.collateralAsset.symbol}
+                            <span className="text-[var(--text-primary)] font-medium text-base group-hover:underline">
+                              {market.loanAsset.symbol}
                             </span>
                           </div>
-                        )}
-                      </div>
+                          {market.collateralAsset && (
+                            <div className="flex items-center gap-2">
+                              <TokenLogo
+                                address={market.collateralAsset.address}
+                                symbol={market.collateralAsset.symbol}
+                                logoURI={market.collateralAsset.logoURI}
+                                size="sm"
+                              />
+                              <span className="text-[var(--text-secondary)] text-sm group-hover:underline">
+                                {market.collateralAsset.symbol}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </a>
                     </TableCell>
                     {/* Average (净存入量) */}
                     <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">

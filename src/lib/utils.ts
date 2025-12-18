@@ -70,6 +70,6 @@ export function getMarketUrl(
   loanSymbol: string,
   collateralSymbol: string
 ): string {
-  return `${morphoAppUrl}/market/${uniqueKey}/${loanSymbol}-${collateralSymbol}`
+  return `${morphoAppUrl}/market/${uniqueKey}/${collateralSymbol}-${loanSymbol}`
 }
 
