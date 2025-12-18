@@ -8,7 +8,7 @@ export function useUserPositions() {
 
   return useQuery({
     queryKey: ['positions', address, chainId],
-    queryFn: () => fetchUserPositions(address!, chainId),
+    queryFn: () => fetchUserPositions(address as string, chainId),
     enabled: isConnected && !!address,
     staleTime: 30000,
   })

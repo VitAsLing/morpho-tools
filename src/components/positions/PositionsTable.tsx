@@ -4,6 +4,15 @@ import type { UserPosition } from '@/types'
 import { ApyDisplay } from '../markets/ApyDisplay'
 import { WithdrawModal } from './WithdrawModal'
 import { TokenLogo } from '@/components/common/TokenLogo'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
 import { formatUsd, formatTokenAmount, formatPercent } from '@/lib/utils'
 import { calculateCostBasis, calculateProfit } from '@/lib/transactionStore'
 
@@ -23,39 +32,39 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
       {/* Spacer to match Markets filter section height */}
       <div style={{ height: '46px' }} />
       <div className="overflow-x-auto" style={{ minHeight: '400px' }}>
-        <table className="table-fixed-layout">
-          <thead className="border-b border-[var(--border)]">
-            <tr>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[160px]">
+        <Table className="table-fixed-layout">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="text-base normal-case tracking-normal w-[160px]">
                 Market
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Average
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[120px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[120px]">
                 Position
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Profit
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Utilization
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[80px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 LLTV
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[120px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[120px]">
                 Net APY
-              </th>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
+              </TableHead>
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {isLoading ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12">
                   <div className="flex items-center justify-center gap-2 text-[var(--text-secondary)]">
                     <svg className="w-5 h-5 spinner" viewBox="0 0 24 24" fill="none">
                       <circle
@@ -74,20 +83,20 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                     </svg>
                     Loading positions...
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : error ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center text-[var(--error)]">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12 text-[var(--error)]">
                   Failed to load positions. Please try again.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : positions.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center text-[var(--text-secondary)]">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12 text-[var(--text-secondary)]">
                   No positions found. Supply to a market to see your positions here.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               positions.map((position) => {
                 const market = position.market
@@ -116,26 +125,23 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                   : null
 
                 return (
-                  <tr
-                    key={market.uniqueKey}
-                    className="border-b border-[var(--border)] hover:bg-[var(--bg-tertiary)]"
-                  >
+                  <TableRow key={market.uniqueKey}>
                     {/* Market */}
-                    <td className="px-4 py-5">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-1.5">
+                    <TableCell className="py-5">
+                      <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
+                        <div className="flex items-center gap-2">
                           <TokenLogo
                             address={market.loanAsset.address}
                             symbol={market.loanAsset.symbol}
                             logoURI={market.loanAsset.logoURI}
-                            size="md"
+                            size="sm"
                           />
                           <span className="text-[var(--text-primary)] font-medium text-base">
                             {market.loanAsset.symbol}
                           </span>
                         </div>
                         {market.collateralAsset && (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2">
                             <TokenLogo
                               address={market.collateralAsset.address}
                               symbol={market.collateralAsset.symbol}
@@ -148,9 +154,9 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                           </div>
                         )}
                       </div>
-                    </td>
+                    </TableCell>
                     {/* Average (净存入量) */}
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">
                       {hasHistory ? (
                         <div className="flex items-center gap-1">
                           <TokenLogo
@@ -164,10 +170,10 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                       ) : (
                         <span className="text-[var(--text-secondary)]">—</span>
                       )}
-                    </td>
+                    </TableCell>
                     {/* Position (当前仓位) */}
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
-                      <div className="flex flex-col">
+                    <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">
+                      <div className="flex flex-col min-h-[52px] justify-center">
                         <div className="flex items-center gap-1">
                           <TokenLogo
                             address={market.loanAsset.address}
@@ -179,9 +185,9 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         </div>
                         <span className="text-sm text-[var(--text-secondary)]">{formatUsd(valueUsd)}</span>
                       </div>
-                    </td>
+                    </TableCell>
                     {/* Profit (收益 = 当前持有 - 净存入) */}
-                    <td className={`px-4 py-5 text-base tabular-nums ${
+                    <TableCell className={`py-5 text-base tabular-nums ${
                       profit !== null && profit > 0n
                         ? 'text-[var(--success)]'
                         : profit !== null && profit < 0n
@@ -201,17 +207,17 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                       ) : (
                         <span>—</span>
                       )}
-                    </td>
+                    </TableCell>
                     {/* Utilization */}
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">
                       {formatPercent(market.state.utilization)}
-                    </td>
+                    </TableCell>
                     {/* LLTV */}
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">
                       {formatPercent(Number(market.lltv) / 1e18)}
-                    </td>
+                    </TableCell>
                     {/* Net APY */}
-                    <td className="px-4 py-5">
+                    <TableCell className="py-5">
                       <ApyDisplay
                         netApy={market.state.netSupplyApy}
                         baseApy={market.state.supplyApy}
@@ -220,22 +226,19 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         loanTokenAddress={market.loanAsset.address}
                         loanTokenLogoURI={market.loanAsset.logoURI}
                       />
-                    </td>
+                    </TableCell>
                     {/* Action */}
-                    <td className="px-4 py-5">
-                      <button
-                        onClick={() => setSelectedPosition(position)}
-                        className="btn btn-primary text-base py-2 px-4"
-                      >
+                    <TableCell className="py-5">
+                      <Button onClick={() => setSelectedPosition(position)}>
                         Withdraw
-                      </button>
-                    </td>
-                  </tr>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 )
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {selectedPosition && (

@@ -6,9 +6,7 @@ export function Markets() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-[var(--text-primary)] py-2" style={{ marginBottom: '20px' }}>
-        Markets
-      </h1>
+      <div style={{ height: '66px' }} />
       <MarketsTable markets={markets ?? []} isLoading={isLoading} error={error as Error | null} />
     </div>
   )
