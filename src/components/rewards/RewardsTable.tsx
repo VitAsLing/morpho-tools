@@ -55,19 +55,19 @@ export function RewardsTable({
         <table className="table-fixed-layout">
           <thead className="border-b border-[var(--border)]">
             <tr>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[120px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[120px]">
                 Source
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[150px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[150px]">
                 Claimed
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[200px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[200px]">
                 Claimable
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[150px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[150px]">
                 Next Claimable
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Action
               </th>
             </tr>

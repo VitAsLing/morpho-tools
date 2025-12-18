@@ -26,28 +26,28 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
         <table className="table-fixed-layout">
           <thead className="border-b border-[var(--border)]">
             <tr>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[160px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[160px]">
                 Market
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Average
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[120px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[120px]">
                 Position
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Profit
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Utilization
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[80px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[80px]">
                 LLTV
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[120px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[120px]">
                 Net APY
               </th>
-              <th className="px-4 py-3 text-left text-base font-medium text-[var(--text-secondary)] w-[100px]">
+              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
                 Action
               </th>
             </tr>
