@@ -180,7 +180,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`absolute inset-0 bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] outline-none text-base font-semibold text-[var(--text-secondary)] transition-opacity ${searchQuery ? 'opacity-100' : 'opacity-0 group-hover/search:opacity-100 focus:opacity-100'}`}
+                    className={`absolute inset-0 bg-transparent border-none outline-none text-base font-semibold text-[var(--text-secondary)] transition-opacity ${searchQuery ? 'opacity-100' : 'opacity-0 group-hover/search:opacity-100 focus:opacity-100'}`}
                   />
                 </div>
               </TableHead>
