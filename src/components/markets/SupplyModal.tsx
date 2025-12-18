@@ -4,6 +4,7 @@ import type { Market, MarketParams } from '@/types'
 import { useTokenApproval } from '@/hooks/useTokenApproval'
 import { useSupply } from '@/hooks/useSupply'
 import { addTransaction } from '@/lib/transactionStore'
+import { Button } from '@/components/ui/button'
 import {
   formatUsd,
   formatPercent,
@@ -117,14 +118,16 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
               Supply {market.loanAsset.symbol}
             </h2>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -205,12 +208,13 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
               disabled={!isConnected}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              <button
+              <Button
+                variant="link"
                 onClick={handleMaxClick}
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] hover:opacity-80 text-sm font-medium cursor-pointer transition-all"
+                className="text-sm font-medium"
               >
                 MAX
-              </button>
+              </Button>
               <span className="text-[var(--text-secondary)]">{market.loanAsset.symbol}</span>
             </div>
           </div>
@@ -224,18 +228,18 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
 
         <div style={{ marginTop: '16px' }}>
           {!isConnected ? (
-            <button className="btn btn-primary w-full" disabled>
+            <Button className="w-full" disabled>
               Connect Wallet
-            </button>
+            </Button>
           ) : isSuccess ? (
-            <button className="btn btn-primary w-full bg-[var(--success)]" disabled>
+            <Button variant="success" className="w-full" disabled>
               Success!
-            </button>
+            </Button>
           ) : requiresApproval ? (
-            <button
+            <Button
               onClick={handleApprove}
               disabled={!isValidAmount || isApproving}
-              className="btn btn-primary w-full"
+              className="w-full"
             >
               {isApproving ? (
                 <span className="flex items-center justify-center gap-2">
@@ -248,12 +252,12 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
               ) : (
                 `Approve ${market.loanAsset.symbol}`
               )}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handleSupply}
               disabled={!isValidAmount || isSupplying}
-              className="btn btn-primary w-full"
+              className="w-full"
             >
               {isSupplying ? (
                 <span className="flex items-center justify-center gap-2">
@@ -266,7 +270,7 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
               ) : (
                 `Supply ${market.loanAsset.symbol}`
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>

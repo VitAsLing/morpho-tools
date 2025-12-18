@@ -8,9 +8,7 @@ export function Positions() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-[var(--text-primary)] py-2" style={{ marginBottom: '20px' }}>
-        Positions
-      </h1>
+      <div style={{ height: '66px' }} />
       {!isConnected ? (
         <div className="text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <p className="text-[var(--text-secondary)] text-lg">

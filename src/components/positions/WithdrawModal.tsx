@@ -3,6 +3,7 @@ import { useAccount, useChainId } from 'wagmi'
 import type { UserPosition, MarketParams } from '@/types'
 import { useWithdraw } from '@/hooks/useWithdraw'
 import { addTransaction } from '@/lib/transactionStore'
+import { Button } from '@/components/ui/button'
 import {
   formatTokenAmount,
   parseTokenAmount,
@@ -104,14 +105,16 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
               Withdraw {market.loanAsset.symbol}
             </h2>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -177,12 +180,13 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
               disabled={!isConnected}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              <button
+              <Button
+                variant="link"
                 onClick={handleMaxClick}
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] hover:opacity-80 text-sm font-medium cursor-pointer transition-all"
+                className="text-sm font-medium"
               >
                 MAX
-              </button>
+              </Button>
               <span className="text-[var(--text-secondary)]">{market.loanAsset.symbol}</span>
             </div>
           </div>
@@ -190,18 +194,18 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
 
         <div style={{ marginTop: '16px' }}>
           {!isConnected ? (
-            <button className="btn btn-primary w-full" disabled>
+            <Button className="w-full" disabled>
               Connect Wallet
-            </button>
+            </Button>
           ) : isSuccess ? (
-            <button className="btn btn-primary w-full bg-[var(--success)]" disabled>
+            <Button variant="success" className="w-full" disabled>
               Success!
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handleWithdraw}
               disabled={!isValidAmount || isWithdrawing}
-              className="btn btn-primary w-full"
+              className="w-full"
             >
               {isWithdrawing ? (
                 <span className="flex items-center justify-center gap-2">
@@ -225,7 +229,7 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
               ) : (
                 `Withdraw ${market.loanAsset.symbol}`
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>

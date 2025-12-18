@@ -1,7 +1,9 @@
 import type { Address } from 'viem'
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-export function shortenAddress(address: string, chars = 4): string {
-  return `${address.slice(0, chars + 2)}...${address.slice(-chars)}`
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 export function formatNumber(value: number): string {
@@ -54,10 +56,6 @@ export function getTokenLogoUrl(address: Address, logoURI?: string | null): stri
   return `https://tokens.1inch.io/${address.toLowerCase()}.png`
 }
 
-export function getMorphoCdnLogoUrl(address: Address): string {
-  return `https://cdn.morpho.org/assets/logos/${address.toLowerCase()}.svg`
-}
-
 export function getMarketUrl(
   morphoAppUrl: string,
   uniqueKey: string,
@@ -67,6 +65,3 @@ export function getMarketUrl(
   return `${morphoAppUrl}/market/${uniqueKey}/${loanSymbol}-${collateralSymbol}`
 }
 
-export function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ')
-}

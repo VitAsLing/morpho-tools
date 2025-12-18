@@ -17,7 +17,7 @@ export function useRewards() {
     queryKey: ['rewards', address, chainId],
     queryFn: async (): Promise<RewardsData> => {
       try {
-        const { merkl, morpho } = await fetchAllRewards(address!, chainId)
+        const { merkl, morpho } = await fetchAllRewards(address as string, chainId)
 
         const allRewards = [...(merkl || []), ...(morpho || [])]
 

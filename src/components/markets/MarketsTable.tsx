@@ -4,6 +4,16 @@ import type { Market, SortField, SortDirection } from '@/types'
 import { ApyDisplay } from './ApyDisplay'
 import { SupplyModal } from './SupplyModal'
 import { TokenLogo } from '@/components/common/TokenLogo'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import { Slider } from '@/components/ui/slider'
 import { formatUsd, formatPercent, getMarketUrl } from '@/lib/utils'
 import { getChainConfig } from '@/lib/morpho/constants'
 
@@ -123,8 +133,8 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
     children: React.ReactNode
     className?: string
   }) => (
-    <th
-      className={`px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] ${className}`}
+    <TableHead
+      className={`text-base normal-case tracking-normal cursor-pointer hover:text-[var(--text-primary)] ${className}`}
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center gap-1">
@@ -133,21 +143,20 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
           <span className="text-[var(--accent)]">{sortDirection === 'asc' ? '↑' : '↓'}</span>
         )}
       </div>
-    </th>
+    </TableHead>
   )
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4" style={{ height: '36px', marginBottom: '10px' }}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Min Supply:</span>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="10"
-            value={minSupply}
-            onChange={(e) => setMinSupply(Number(e.target.value))}
+          <Slider
+            value={[minSupply]}
+            onValueChange={(value) => setMinSupply(value[0])}
+            min={0}
+            max={100}
+            step={10}
             className="w-24 sm:w-40"
           />
           <span className="text-sm sm:text-base text-[var(--text-primary)] w-12 sm:w-14">${minSupply}M</span>
@@ -155,21 +164,26 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
       </div>
 
       <div className="overflow-x-auto" style={{ minHeight: '400px' }}>
-        <table className="table-fixed-layout">
-          <thead className="border-b border-[var(--border)]">
-            <tr>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[180px] group">
+        <Table className="table-fixed-layout">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="text-base normal-case tracking-normal w-[180px] group/search">
                 <div className="relative h-7 flex items-center">
-                  <span className={`transition-opacity ${searchQuery ? 'opacity-0' : 'group-hover:opacity-0'}`}>Market</span>
+                  <span className={`flex items-center gap-1 text-base font-semibold text-[var(--text-secondary)] transition-opacity pointer-events-none ${searchQuery ? 'opacity-0' : 'group-hover/search:opacity-0 group-focus-within/search:opacity-0'}`}>
+                    Market
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </span>
                   <input
                     type="text"
-                    placeholder="Market"
+                    placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`absolute inset-0 bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] outline-none text-lg font-semibold transition-opacity ${searchQuery ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                    className={`absolute inset-0 bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] outline-none text-base font-semibold text-[var(--text-secondary)] transition-opacity ${searchQuery ? 'opacity-100' : 'opacity-0 group-hover/search:opacity-100 focus:opacity-100'}`}
                   />
                 </div>
-              </th>
+              </TableHead>
               <SortHeader field="totalSupply" className="w-[120px]">
                 Total Supply
               </SortHeader>
@@ -188,15 +202,15 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
               <SortHeader field="netApy" className="w-[140px]">
                 Net APY
               </SortHeader>
-              <th className="px-4 py-3 text-left text-lg font-semibold text-[var(--text-secondary)] w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {isLoading ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12">
                   <div className="flex items-center justify-center gap-2 text-[var(--text-secondary)]">
                     <svg className="w-5 h-5 spinner" viewBox="0 0 24 24" fill="none">
                       <circle
@@ -215,20 +229,20 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                     </svg>
                     Loading markets...
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : error ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center text-[var(--error)]">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12 text-[var(--error)]">
                   Failed to load markets. Please try again.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : filteredAndSortedMarkets.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 !text-center text-[var(--text-secondary)]">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-12 text-[var(--text-secondary)]">
                   No markets found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               filteredAndSortedMarkets.map((market) => {
                 const totalSupplyUsd =
@@ -240,11 +254,8 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                 const liquidityUsd = totalSupplyUsd - totalBorrowUsd
 
                 return (
-                  <tr
-                    key={market.uniqueKey}
-                    className="border-b border-[var(--border)] hover:bg-[var(--bg-tertiary)]"
-                  >
-                    <td className="px-4 py-5">
+                  <TableRow key={market.uniqueKey}>
+                    <TableCell className="py-5">
                       <a
                         href={getMarketUrl(
                           chainConfig.morphoAppUrl,
@@ -256,7 +267,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         rel="noopener noreferrer"
                         className="group flex items-center gap-2"
                       >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
                           <div className="flex items-center gap-2">
                             <TokenLogo
                               address={market.loanAsset.address}
@@ -283,23 +294,23 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                           )}
                         </div>
                       </a>
-                    </td>
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    </TableCell>
+                    <TableCell className="py-5 text-base tabular-nums">
                       {formatUsd(totalSupplyUsd)}
-                    </td>
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    </TableCell>
+                    <TableCell className="py-5 text-base tabular-nums">
                       {formatUsd(totalBorrowUsd)}
-                    </td>
-                    <td className="px-4 py-5 text-[var(--success)] text-base tabular-nums">
+                    </TableCell>
+                    <TableCell className="py-5 text-[var(--success)] text-base tabular-nums">
                       {formatUsd(liquidityUsd)}
-                    </td>
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    </TableCell>
+                    <TableCell className="py-5 text-base tabular-nums">
                       {formatPercent(market.state.utilization)}
-                    </td>
-                    <td className="px-4 py-5 text-[var(--text-primary)] text-base tabular-nums">
+                    </TableCell>
+                    <TableCell className="py-5 text-base tabular-nums">
                       {formatPercent(Number(market.lltv) / 1e18)}
-                    </td>
-                    <td className="px-4 py-5">
+                    </TableCell>
+                    <TableCell className="py-5">
                       <ApyDisplay
                         netApy={market.state.netSupplyApy}
                         baseApy={market.state.supplyApy}
@@ -308,21 +319,18 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         loanTokenAddress={market.loanAsset.address}
                         loanTokenLogoURI={market.loanAsset.logoURI}
                       />
-                    </td>
-                    <td className="px-4 py-5">
-                      <button
-                        onClick={() => setSelectedMarket(market)}
-                        className="btn btn-primary text-base py-2 px-4"
-                      >
+                    </TableCell>
+                    <TableCell className="py-5">
+                      <Button onClick={() => setSelectedMarket(market)}>
                         Supply
-                      </button>
-                    </td>
-                  </tr>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 )
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {selectedMarket && (
