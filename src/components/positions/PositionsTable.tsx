@@ -37,28 +37,28 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
         <Table className="table-fixed-layout">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="text-base normal-case tracking-normal w-[160px]">
+              <TableHead className="text-base normal-case tracking-normal w-[140px]">
                 Market
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Average
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[120px]">
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Position
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Profit
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Utilization
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[80px]">
+              <TableHead className="text-base normal-case tracking-normal w-[60px]">
                 LLTV
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[120px]">
+              <TableHead className="text-base normal-case tracking-normal w-[100px]">
                 Net APY
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Action
               </TableHead>
             </TableRow>
@@ -243,7 +243,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                     </TableCell>
                     {/* Action */}
                     <TableCell className="py-5">
-                      <Button onClick={() => setSelectedPosition(position)}>
+                      <Button onClick={() => setSelectedPosition(position)} className="w-24">
                         Withdraw
                       </Button>
                     </TableCell>
