@@ -250,7 +250,7 @@ body {
 
 /* 内容区域宽度 - 使用 clamp 动态调整 */
 .content-width {
-  width: clamp(68%, 85vw, 95%);
+  width: clamp(65%, 80vw, 92%);
   margin-left: auto;
   margin-right: auto;
 }

@@ -167,7 +167,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
         <Table className="table-fixed-layout">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="text-base normal-case tracking-normal w-[180px] group/search">
+              <TableHead className="text-base normal-case tracking-normal w-[140px] group/search">
                 <div className="relative h-7 flex items-center">
                   <span className={`flex items-center gap-1 text-base font-semibold text-[var(--text-secondary)] transition-opacity pointer-events-none ${searchQuery ? 'opacity-0' : 'group-hover/search:opacity-0 group-focus-within/search:opacity-0'}`}>
                     Market
@@ -184,25 +184,25 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                   />
                 </div>
               </TableHead>
-              <SortHeader field="totalSupply" className="w-[120px]">
+              <SortHeader field="totalSupply" className="w-[100px]">
                 Total Supply
               </SortHeader>
-              <SortHeader field="totalBorrow" className="w-[120px]">
+              <SortHeader field="totalBorrow" className="w-[100px]">
                 Total Borrow
               </SortHeader>
-              <SortHeader field="liquidity" className="w-[120px]">
+              <SortHeader field="liquidity" className="w-[100px]">
                 Liquidity
               </SortHeader>
-              <SortHeader field="utilization" className="w-[100px]">
+              <SortHeader field="utilization" className="w-[80px]">
                 Utilization
               </SortHeader>
-              <SortHeader field="lltv" className="w-[80px]">
+              <SortHeader field="lltv" className="w-[60px]">
                 LLTV
               </SortHeader>
-              <SortHeader field="netApy" className="w-[140px]">
+              <SortHeader field="netApy" className="w-[120px]">
                 Net APY
               </SortHeader>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Action
               </TableHead>
             </TableRow>
@@ -321,7 +321,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                       />
                     </TableCell>
                     <TableCell className="py-5">
-                      <Button onClick={() => setSelectedMarket(market)}>
+                      <Button onClick={() => setSelectedMarket(market)} className="w-24">
                         Supply
                       </Button>
                     </TableCell>
