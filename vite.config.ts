@@ -13,8 +13,7 @@ export default defineConfig(({ mode }) => ({
       autoExcludeNodeModules: true,
       options: {
         compact: true,
-        controlFlowFlattening: true,
-        controlFlowFlatteningThreshold: 0.5,
+        controlFlowFlattening: false,
         deadCodeInjection: false,
         debugProtection: false,
         disableConsoleOutput: true,
@@ -26,8 +25,8 @@ export default defineConfig(({ mode }) => ({
         splitStrings: false,
         stringArray: true,
         stringArrayEncoding: ['none'],
-        stringArrayThreshold: 0.5,
-        transformObjectKeys: true,
+        stringArrayThreshold: 0.75,
+        transformObjectKeys: false,
         unicodeEscapeSequence: false,
       },
     }),
@@ -64,10 +63,16 @@ export default defineConfig(({ mode }) => ({
   },
   // Security headers for dev server
   server: {
+    port: 5173,
+    strictPort: true,
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
     },
+  },
+  preview: {
+    port: 4173,
+    strictPort: true,
   },
 }))
