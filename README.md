@@ -22,7 +22,6 @@ A modern web interface for interacting with [Morpho Blue](https://morpho.org/) l
 - **Wallet**: RainbowKit
 - **Data Fetching**: TanStack Query + GraphQL Request
 - **Routing**: React Router 7
-- **Security**: vite-plugin-bundle-obfuscator (production build)
 
 ## Getting Started
 
