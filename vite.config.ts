@@ -1,9 +1,39 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import obfuscatorPlugin from 'vite-plugin-bundle-obfuscator'
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    mode === 'production' && obfuscatorPlugin({
+      enable: true,
+      log: true,
+      autoExcludeNodeModules: true,
+      options: {
+        compact: true,
+        controlFlowFlattening: true,
+        controlFlowFlatteningThreshold: 0.75,
+        deadCodeInjection: true,
+        deadCodeInjectionThreshold: 0.4,
+        debugProtection: false,
+        disableConsoleOutput: true,
+        identifierNamesGenerator: 'hexadecimal',
+        renameGlobals: false,
+        rotateStringArray: true,
+        selfDefending: true,
+        shuffleStringArray: true,
+        splitStrings: true,
+        splitStringsChunkLength: 10,
+        stringArray: true,
+        stringArrayEncoding: ['base64'],
+        stringArrayThreshold: 0.75,
+        transformObjectKeys: true,
+        unicodeEscapeSequence: false,
+      },
+    }),
+  ].filter(Boolean),
   build: {
     outDir: 'dist',
     // Production security settings
