@@ -129,7 +129,7 @@ export function aggregateMorphoRewards(rewards: MorphoReward[]): AggregatedRewar
         tokenAddress: reward.asset.address,
         tokenSymbol: 'MORPHO',
         tokenDecimals: 18,
-        tokenPrice: 1.19, // Default price
+        tokenPrice: 0, // Price fetched separately if needed
         tokenLogoURI: getMorphoLogoUrl(),
         chainId: reward.asset.chain_id,
         totalEarned: BigInt(reward.amount.total),

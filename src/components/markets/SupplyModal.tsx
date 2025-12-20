@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAccount, useChainId } from 'wagmi'
+import { maxUint256 } from 'viem'
 import type { Market, MarketParams } from '@/types'
 import { useTokenApproval } from '@/hooks/useTokenApproval'
 import { useSupply } from '@/hooks/useSupply'
 import { addTransaction } from '@/lib/transactionStore'
+import { addToast } from '@/lib/toastStore'
+import { getChainConfig } from '@/lib/morpho/constants'
 import { Button } from '@/components/ui/button'
 import {
   formatUsd,
@@ -23,11 +26,13 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const [amount, setAmount] = useState('')
-  const { balance, approve, needsApproval, isApproving, refetchBalance } = useTokenApproval(
+  const { balance, approve, needsApproval, approvalError, refetchBalance } = useTokenApproval(
     market.loanAsset.address
   )
+  const chainConfig = getChainConfig(chainId)
   const { supply, isSupplying, isSuccess, reset, hash } = useSupply()
   const recordedRef = useRef(false)
+  const [approvalState, setApprovalState] = useState<'idle' | 'pending' | 'success'>('idle')
 
   const parsedAmount = amount ? parseTokenAmount(amount, market.loanAsset.decimals) : 0n
   const requiresApproval = parsedAmount > 0n && needsApproval(parsedAmount)
@@ -70,19 +75,41 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
         timestamp: Date.now(),
         txHash: hash,
       })
+      // Toast 通知
+      addToast('success', `Supplied ${formatTokenAmount(parsedAmount, market.loanAsset.decimals)} ${market.loanAsset.symbol}`, {
+        url: `${chainConfig.explorerUrl}/tx/${hash}`,
+        text: 'View transaction',
+      })
       refetchBalance()
       setTimeout(() => {
         reset()
         onClose()
       }, 2000)
     }
-  }, [isSuccess, address, chainId, market, parsedAmount, hash, refetchBalance, reset, onClose])
+  }, [isSuccess, address, chainId, market, parsedAmount, hash, refetchBalance, reset, onClose, chainConfig.explorerUrl])
 
   const handleApprove = async () => {
     try {
-      await approve(parsedAmount)
+      setApprovalState('pending')
+      const hash = await approve(maxUint256)
+      if (hash) {
+        setApprovalState('success')
+        addToast('success', 'Approved successfully', {
+          url: `${chainConfig.explorerUrl}/tx/${hash}`,
+          text: 'View transaction',
+        })
+        // 1.5秒后恢复 idle 状态
+        setTimeout(() => setApprovalState('idle'), 1500)
+      }
     } catch (error) {
+      setApprovalState('idle')
+      // 用户取消不显示错误
+      const message = error instanceof Error ? error.message : ''
+      if (message.toLowerCase().includes('user rejected') || message.toLowerCase().includes('user denied')) {
+        return
+      }
       console.error('Approval failed:', error)
+      addToast('error', 'Approval failed. Please try again.')
     }
   }
 
@@ -90,7 +117,13 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
     try {
       await supply(marketParams, parsedAmount)
     } catch (error) {
+      // 用户取消不显示错误
+      const message = error instanceof Error ? error.message : ''
+      if (message.toLowerCase().includes('user rejected') || message.toLowerCase().includes('user denied')) {
+        return
+      }
       console.error('Supply failed:', error)
+      addToast('error', 'Supply failed. Please try again.')
     }
   }
 
@@ -246,16 +279,37 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
             <Button variant="success" className="w-full" disabled>
               Success!
             </Button>
-          ) : requiresApproval ? (
+          ) : approvalError ? (
             <Button
               onClick={handleApprove}
-              disabled={!isValidAmount || isApproving}
               className="w-full"
+              style={{ backgroundColor: 'var(--error)' }}
             >
-              {isApproving ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {approvalError} - Retry
+              </span>
+            </Button>
+          ) : requiresApproval || approvalState !== 'idle' ? (
+            <Button
+              onClick={handleApprove}
+              disabled={!isValidAmount || approvalState !== 'idle'}
+              className="w-full"
+              variant={approvalState === 'success' ? 'success' : 'default'}
+            >
+              {approvalState === 'success' ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4 spinner" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Approved
+                </span>
+              ) : approvalState === 'pending' ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0 spinner" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   Approving...

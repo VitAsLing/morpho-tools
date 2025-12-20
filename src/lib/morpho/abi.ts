@@ -51,20 +51,6 @@ export const MORPHO_ABI = [
       { name: 'sharesWithdrawn', type: 'uint256' },
     ],
   },
-  {
-    name: 'position',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'id', type: 'bytes32' },
-      { name: 'user', type: 'address' },
-    ],
-    outputs: [
-      { name: 'supplyShares', type: 'uint256' },
-      { name: 'borrowShares', type: 'uint128' },
-      { name: 'collateral', type: 'uint128' },
-    ],
-  },
 ] as const
 
 export const ERC20_ABI = [

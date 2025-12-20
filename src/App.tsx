@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Web3Provider } from './providers/Web3Provider'
 import { Layout } from './components/layout/Layout'
+import { ToastContainer } from './components/ui/Toast'
 import { Markets } from './pages/Markets'
 import { Positions } from './pages/Positions'
 import { Rewards } from './pages/Rewards'
@@ -16,6 +17,7 @@ export function App() {
             <Route path="/rewards" element={<Rewards />} />
           </Routes>
         </Layout>
+        <ToastContainer />
       </BrowserRouter>
     </Web3Provider>
   )

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi'
 import type { Address } from 'viem'
 import { ERC20_ABI } from '@/lib/morpho/abi'
 import { getMorphoAddress } from '@/lib/morpho/constants'
@@ -8,8 +8,10 @@ import { useChainId } from 'wagmi'
 export function useTokenApproval(tokenAddress: Address | undefined) {
   const { address } = useAccount()
   const chainId = useChainId()
+  const publicClient = usePublicClient()
   const morphoAddress = getMorphoAddress(chainId)
   const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>()
+  const [approvalError, setApprovalError] = useState<string | undefined>()
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: tokenAddress,
@@ -38,20 +40,38 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
   })
 
   const approve = useCallback(
-    async (amount: bigint) => {
-      if (!tokenAddress) return
+    async (amount: bigint): Promise<`0x${string}` | undefined> => {
+      if (!tokenAddress || !publicClient) return undefined
 
-      const hash = await writeContractAsync({
-        address: tokenAddress,
-        abi: ERC20_ABI,
-        functionName: 'approve',
-        args: [morphoAddress, amount],
-      })
+      setApprovalError(undefined)
 
-      setApprovalHash(hash)
-      await refetchAllowance()
+      try {
+        const hash = await writeContractAsync({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'approve',
+          args: [morphoAddress, amount],
+        })
+
+        setApprovalHash(hash)
+
+        // Wait for transaction to be confirmed before refetching allowance
+        await publicClient.waitForTransactionReceipt({ hash })
+        await refetchAllowance()
+
+        return hash
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Approval failed'
+        // 简化错误信息
+        if (message.includes('User rejected') || message.includes('user rejected')) {
+          setApprovalError('User rejected')
+        } else {
+          setApprovalError('Failed')
+        }
+        throw error
+      }
     },
-    [tokenAddress, morphoAddress, writeContractAsync, refetchAllowance]
+    [tokenAddress, morphoAddress, publicClient, writeContractAsync, refetchAllowance]
   )
 
   const needsApproval = useCallback(
@@ -68,6 +88,8 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
     approve,
     needsApproval,
     isApproving: isApproving || isWaitingForApproval,
+    approvalHash,
+    approvalError,
     refetchAllowance,
     refetchBalance,
   }

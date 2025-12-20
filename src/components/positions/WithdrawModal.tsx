@@ -3,6 +3,8 @@ import { useAccount, useChainId } from 'wagmi'
 import type { UserPosition, MarketParams } from '@/types'
 import { useWithdraw } from '@/hooks/useWithdraw'
 import { addTransaction } from '@/lib/transactionStore'
+import { addToast } from '@/lib/toastStore'
+import { getChainConfig } from '@/lib/morpho/constants'
 import { Button } from '@/components/ui/button'
 import {
   formatTokenAmount,
@@ -20,6 +22,7 @@ interface WithdrawModalProps {
 export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
+  const chainConfig = getChainConfig(chainId)
   const [amount, setAmount] = useState('')
   const { withdraw, isWithdrawing, isSuccess, reset, hash } = useWithdraw()
   const recordedRef = useRef(false)
@@ -64,12 +67,17 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
         timestamp: Date.now(),
         txHash: hash,
       })
+      // Toast 通知
+      addToast('success', `Withdrew ${formatTokenAmount(parsedAmount, market.loanAsset.decimals)} ${market.loanAsset.symbol}`, {
+        url: `${chainConfig.explorerUrl}/tx/${hash}`,
+        text: 'View transaction',
+      })
       setTimeout(() => {
         reset()
         onClose()
       }, 2000)
     }
-  }, [isSuccess, address, chainId, market, parsedAmount, hash, reset, onClose])
+  }, [isSuccess, address, chainId, market, parsedAmount, hash, reset, onClose, chainConfig.explorerUrl])
 
   const handleWithdraw = async () => {
     try {
@@ -81,7 +89,13 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
         await withdraw(marketParams, parsedAmount, false)
       }
     } catch (error) {
+      // 用户取消不显示错误
+      const message = error instanceof Error ? error.message : ''
+      if (message.toLowerCase().includes('user rejected') || message.toLowerCase().includes('user denied')) {
+        return
+      }
       console.error('Withdraw failed:', error)
+      addToast('error', 'Withdraw failed. Please try again.')
     }
   }
 
