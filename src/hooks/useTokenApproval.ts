@@ -62,12 +62,12 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
         return hash
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Approval failed'
-        // 简化错误信息
-        if (message.includes('User rejected') || message.includes('user rejected')) {
-          setApprovalError('User rejected')
-        } else {
-          setApprovalError('Failed')
+        // 用户取消不设置错误状态
+        if (message.toLowerCase().includes('user rejected') || message.toLowerCase().includes('user denied')) {
+          throw error
         }
+        // 其他错误才设置错误状态
+        setApprovalError('Failed')
         throw error
       }
     },

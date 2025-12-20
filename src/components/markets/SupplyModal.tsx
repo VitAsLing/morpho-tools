@@ -26,7 +26,7 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const [amount, setAmount] = useState('')
-  const { balance, approve, needsApproval, approvalError, refetchBalance } = useTokenApproval(
+  const { balance, approve, needsApproval, refetchBalance } = useTokenApproval(
     market.loanAsset.address
   )
   const chainConfig = getChainConfig(chainId)
@@ -278,19 +278,6 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
           ) : isSuccess ? (
             <Button variant="success" className="w-full" disabled>
               Success!
-            </Button>
-          ) : approvalError ? (
-            <Button
-              onClick={handleApprove}
-              className="w-full"
-              style={{ backgroundColor: 'var(--error)' }}
-            >
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                {approvalError} - Retry
-              </span>
             </Button>
           ) : requiresApproval || approvalState !== 'idle' ? (
             <Button
