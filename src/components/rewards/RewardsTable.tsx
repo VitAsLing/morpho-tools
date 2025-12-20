@@ -9,7 +9,7 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { formatTokenAmount, formatUsd } from '@/lib/utils'
-import type { AggregatedReward } from '@/lib/merkl/api'
+import type { AggregatedReward } from '@/types'
 import type { RewardsData } from '@/hooks/useRewards'
 import { useAccount } from 'wagmi'
 

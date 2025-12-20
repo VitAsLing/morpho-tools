@@ -186,3 +186,20 @@ export interface PositionProfitData {
   profit: bigint // Profit = currentValue - netDeposited
   profitPercent: number // Profit as percentage of netDeposited
 }
+
+// Aggregated reward structure (unified for both Merkl and Morpho sources)
+export interface AggregatedReward {
+  tokenAddress: string
+  tokenSymbol: string
+  tokenDecimals: number
+  tokenPrice: number
+  tokenLogoURI: string | null
+  chainId: number
+  totalEarned: bigint
+  claimableNow: bigint // amount - claimed - pending
+  claimableNext: bigint // pending
+  claimed: bigint
+  proofs: string[]
+  root: string
+  source: 'merkl' | 'morpho'
+}
