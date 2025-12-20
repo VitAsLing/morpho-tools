@@ -134,6 +134,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                 // Profit 计算 - token 计价
                 let profitValue: bigint | null = null
                 let profitFormatted: string | null = null
+                let profitPercent: number | null = null
 
                 if (hasApiData) {
                   profitValue = apiProfitData.profit
@@ -141,6 +142,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                     profitValue >= 0n ? profitValue : -profitValue,
                     market.loanAsset.decimals
                   )
+                  profitPercent = apiProfitData.profitPercent
                 } else if (hasLocalHistory) {
                   const localProfit = calculateProfit(costBasis, currentTokens)
                   if (localProfit !== null) {
@@ -149,6 +151,10 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                       localProfit >= 0n ? localProfit : -localProfit,
                       market.loanAsset.decimals
                     )
+                    // Calculate profit percent from local data
+                    if (costBasis.netDeposited > 0n) {
+                      profitPercent = Number(localProfit * 10000n / costBasis.netDeposited) / 100
+                    }
                   }
                 }
 
@@ -235,14 +241,21 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         : 'text-[var(--text-secondary)]'
                     }`}>
                       {hasHistory && profitValue !== null ? (
-                        <div className="flex items-center gap-1">
-                          <TokenLogo
-                            address={market.loanAsset.address}
-                            symbol={market.loanAsset.symbol}
-                            logoURI={market.loanAsset.logoURI}
-                            size="sm"
-                          />
-                          <span>{profitValue >= 0n ? '+' : '-'}{profitFormatted}</span>
+                        <div className="flex flex-col min-h-[52px] justify-center">
+                          <div className="flex items-center gap-1">
+                            <TokenLogo
+                              address={market.loanAsset.address}
+                              symbol={market.loanAsset.symbol}
+                              logoURI={market.loanAsset.logoURI}
+                              size="sm"
+                            />
+                            <span>{profitValue >= 0n ? '+' : '-'}{profitFormatted}</span>
+                          </div>
+                          {profitPercent !== null && (
+                            <span className="text-sm">
+                              {profitPercent >= 0 ? '+' : ''}{profitPercent.toFixed(2)}%
+                            </span>
+                          )}
                         </div>
                       ) : (
                         <span>—</span>

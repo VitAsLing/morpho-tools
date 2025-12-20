@@ -101,17 +101,28 @@ export function calculatePositionProfit(
 
   let totalSupplied = 0n
   let totalWithdrawn = 0n
+  let runningShares = 0n
 
   // Sort by timestamp ascending for accurate calculation
   const sortedTxs = [...marketTxs].sort((a, b) => a.timestamp - b.timestamp)
 
   for (const tx of sortedTxs) {
     const assets = BigInt(tx.data.assets ?? '0')
+    const shares = BigInt(tx.data.shares ?? '0')
 
     if (tx.type === 'MarketSupply') {
       totalSupplied += assets
+      runningShares += shares
     } else if (tx.type === 'MarketWithdraw') {
       totalWithdrawn += assets
+      runningShares -= shares
+    }
+
+    // When shares reach zero, reset for new cycle
+    if (runningShares <= 0n) {
+      totalSupplied = 0n
+      totalWithdrawn = 0n
+      runningShares = 0n
     }
   }
 
