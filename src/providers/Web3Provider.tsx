@@ -45,18 +45,19 @@ const config = createConfig({
   transports: {
     [mainnet.id]: fallback([
       http('https://eth.llamarpc.com'),
-      http('https://rpc.ankr.com/eth'),
       http('https://cloudflare-eth.com'),
+      http('https://1rpc.io/eth'),
       http(),
     ]),
     [base.id]: fallback([
       http('https://base.llamarpc.com'),
-      http('https://rpc.ankr.com/base'),
+      http('https://mainnet.base.org'),
+      http('https://1rpc.io/base'),
       http(),
     ]),
     [arbitrum.id]: fallback([
-      http('https://arbitrum.llamarpc.com'),
-      http('https://rpc.ankr.com/arbitrum'),
+      http('https://arb1.arbitrum.io/rpc'),
+      http('https://1rpc.io/arb'),
       http(),
     ]),
   },

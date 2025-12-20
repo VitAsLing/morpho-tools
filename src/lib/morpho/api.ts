@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from 'graphql-request'
-import type { Market, UserPosition } from '@/types'
+import type { Market, UserPosition, UserTransaction } from '@/types'
 import { MORPHO_GRAPHQL_API } from './constants'
 
 const client = new GraphQLClient(MORPHO_GRAPHQL_API)
@@ -104,6 +104,41 @@ const GET_USER_POSITIONS_QUERY = gql`
   }
 `
 
+const GET_USER_TRANSACTIONS_QUERY = gql`
+  query GetUserTransactions($address: String!, $chainId: Int!) {
+    transactions(
+      where: {
+        userAddress_in: [$address]
+        chainId_in: [$chainId]
+        type_in: [MarketSupply, MarketWithdraw]
+      }
+      orderBy: Timestamp
+      orderDirection: Desc
+      first: 500
+    ) {
+      items {
+        type
+        timestamp
+        data {
+          ... on MarketTransferTransactionData {
+            shares
+            assets
+            assetsUsd
+            market {
+              uniqueKey
+              loanAsset {
+                address
+                symbol
+                decimals
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 interface MarketsResponse {
   markets: {
     items: Market[]
@@ -113,6 +148,12 @@ interface MarketsResponse {
 interface UserPositionsResponse {
   marketPositions: {
     items: UserPosition[]
+  }
+}
+
+interface UserTransactionsResponse {
+  transactions: {
+    items: UserTransaction[]
   }
 }
 
@@ -132,4 +173,15 @@ export async function fetchUserPositions(
     { address: address.toLowerCase(), chainId }
   )
   return data.marketPositions.items
+}
+
+export async function fetchUserTransactions(
+  address: string,
+  chainId: number
+): Promise<UserTransaction[]> {
+  const data = await client.request<UserTransactionsResponse>(
+    GET_USER_TRANSACTIONS_QUERY,
+    { address: address.toLowerCase(), chainId }
+  )
+  return data.transactions.items
 }

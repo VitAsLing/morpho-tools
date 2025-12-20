@@ -158,3 +158,31 @@ export interface MorphoRewardsResponse {
   }
   data: MorphoReward[]
 }
+
+// User Transaction Types
+export interface UserTransaction {
+  type: 'MarketSupply' | 'MarketWithdraw'
+  timestamp: number
+  data: {
+    shares: string
+    assets: string
+    assetsUsd: number
+    market: {
+      uniqueKey: string
+      loanAsset: {
+        address: Address
+        symbol: string
+        decimals: number
+      }
+    }
+  }
+}
+
+export interface PositionProfitData {
+  totalSupplied: bigint // Total tokens supplied
+  totalWithdrawn: bigint // Total tokens withdrawn
+  netDeposited: bigint // Net deposited = totalSupplied - totalWithdrawn
+  currentValue: bigint // Current position value in tokens
+  profit: bigint // Profit = currentValue - netDeposited
+  profitPercent: number // Profit as percentage of netDeposited
+}

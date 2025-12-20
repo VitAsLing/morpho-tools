@@ -1,15 +1,20 @@
 import type { Address } from 'viem'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import type { UserTransaction, PositionProfitData } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 export function formatNumber(value: number): string {
-  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(2)}K`
+  // Handle very small values (effectively zero)
+  const absValue = Math.abs(value)
+  if (absValue < 0.01) return '0.00'
+
+  if (absValue >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`
+  if (absValue >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`
+  if (absValue >= 1_000) return `${(value / 1_000).toFixed(2)}K`
   return value.toFixed(2)
 }
 
@@ -28,7 +33,7 @@ export function formatPercent(value: number): string {
 export function formatTokenAmount(
   amount: bigint,
   decimals: number,
-  displayDecimals = 4
+  displayDecimals = 6
 ): string {
   const divisor = BigInt(10 ** decimals)
   const integerPart = amount / divisor
@@ -41,7 +46,9 @@ export function formatTokenAmount(
     return '0'
   }
 
-  return `${integerPart}.${displayFractional}`
+  // Remove trailing zeros and unnecessary decimal point
+  const result = `${integerPart}.${displayFractional}`
+  return result.replace(/\.?0+$/, '')
 }
 
 export function parseTokenAmount(amount: string, decimals: number): bigint {
@@ -71,5 +78,61 @@ export function getMarketUrl(
   collateralSymbol: string
 ): string {
   return `${morphoAppUrl}/market/${uniqueKey}/${collateralSymbol}-${loanSymbol}`
+}
+
+/**
+ * Calculate profit data from transactions for a specific market (token-based)
+ * @param transactions - All user transactions
+ * @param marketKey - Market unique key
+ * @param currentTokens - Current position value in tokens (bigint)
+ * @returns PositionProfitData or null if no transactions
+ */
+export function calculatePositionProfit(
+  transactions: UserTransaction[],
+  marketKey: string,
+  currentTokens: bigint
+): PositionProfitData | null {
+  // Filter transactions for this market (market is now inside data)
+  const marketTxs = transactions.filter((tx) => tx.data?.market?.uniqueKey === marketKey)
+
+  if (marketTxs.length === 0) {
+    return null
+  }
+
+  let totalSupplied = 0n
+  let totalWithdrawn = 0n
+
+  // Sort by timestamp ascending for accurate calculation
+  const sortedTxs = [...marketTxs].sort((a, b) => a.timestamp - b.timestamp)
+
+  for (const tx of sortedTxs) {
+    const assets = BigInt(tx.data.assets ?? '0')
+
+    if (tx.type === 'MarketSupply') {
+      totalSupplied += assets
+    } else if (tx.type === 'MarketWithdraw') {
+      totalWithdrawn += assets
+    }
+  }
+
+  // 净存入量 = 总供应 - 总提取
+  const netDeposited = totalSupplied - totalWithdrawn
+
+  // 收益 = 当前持仓 - 净存入量
+  const profit = currentTokens - netDeposited
+
+  // 收益率 = 收益 / 净存入量 * 100
+  const profitPercent = netDeposited > 0n
+    ? Number(profit * 10000n / netDeposited) / 100
+    : 0
+
+  return {
+    totalSupplied,
+    totalWithdrawn,
+    netDeposited,
+    currentValue: currentTokens,
+    profit,
+    profitPercent,
+  }
 }
 

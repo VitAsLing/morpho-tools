@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
-import type { UserPosition } from '@/types'
+import type { EnrichedUserPosition } from '@/hooks/useUserPositions'
 import { ApyDisplay } from '../markets/ApyDisplay'
 import { WithdrawModal } from './WithdrawModal'
 import { TokenLogo } from '@/components/common/TokenLogo'
@@ -18,7 +18,7 @@ import { getChainConfig } from '@/lib/morpho/constants'
 import { calculateCostBasis, calculateProfit } from '@/lib/transactionStore'
 
 interface PositionsTableProps {
-  positions: UserPosition[]
+  positions: EnrichedUserPosition[]
   isLoading: boolean
   error: Error | null
 }
@@ -27,7 +27,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
   const { address } = useAccount()
   const chainId = useChainId()
   const chainConfig = getChainConfig(chainId)
-  const [selectedPosition, setSelectedPosition] = useState<UserPosition | null>(null)
+  const [selectedPosition, setSelectedPosition] = useState<EnrichedUserPosition | null>(null)
 
   return (
     <div>
@@ -111,20 +111,46 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                   (Number(position.supplyAssets) / 10 ** market.loanAsset.decimals) *
                   (market.loanAsset.priceUsd ?? 0)
 
-                // 从本地存储计算 Average 和 Profit
-                const costBasis = address
+                // 优先使用 API 交易数据计算，否则回退到本地存储
+                const apiProfitData = position.profitData
+                const hasApiData = apiProfitData !== null
+
+                // 本地存储数据作为备选
+                const costBasis = !hasApiData && address
                   ? calculateCostBasis(address, chainId, market.uniqueKey)
                   : null
-                const hasHistory = costBasis && costBasis.transactions.length > 0
-                const averageDeposit = hasHistory
-                  ? formatTokenAmount(costBasis.netDeposited, market.loanAsset.decimals)
-                  : null
-                const profit = hasHistory
-                  ? calculateProfit(costBasis, currentTokens)
-                  : null
-                const profitFormatted = profit !== null
-                  ? formatTokenAmount(profit > 0n ? profit : -profit, market.loanAsset.decimals)
-                  : null
+                const hasLocalHistory = costBasis && costBasis.transactions.length > 0
+
+                // 判断是否有任何数据来源
+                const hasHistory = hasApiData || hasLocalHistory
+
+                // Average (净存入量 = 总供应 - 总提取) - token 计价
+                const averageDeposit = hasApiData
+                  ? formatTokenAmount(apiProfitData.netDeposited, market.loanAsset.decimals)
+                  : hasLocalHistory
+                    ? formatTokenAmount(costBasis.netDeposited, market.loanAsset.decimals)
+                    : null
+
+                // Profit 计算 - token 计价
+                let profitValue: bigint | null = null
+                let profitFormatted: string | null = null
+
+                if (hasApiData) {
+                  profitValue = apiProfitData.profit
+                  profitFormatted = formatTokenAmount(
+                    profitValue >= 0n ? profitValue : -profitValue,
+                    market.loanAsset.decimals
+                  )
+                } else if (hasLocalHistory) {
+                  const localProfit = calculateProfit(costBasis, currentTokens)
+                  if (localProfit !== null) {
+                    profitValue = localProfit
+                    profitFormatted = formatTokenAmount(
+                      localProfit >= 0n ? localProfit : -localProfit,
+                      market.loanAsset.decimals
+                    )
+                  }
+                }
 
                 return (
                   <TableRow key={market.uniqueKey}>
@@ -169,7 +195,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         </div>
                       </a>
                     </TableCell>
-                    {/* Average (净存入量) */}
+                    {/* Average (净存入量 = 总供应 - 总提取) */}
                     <TableCell className="py-5 text-[var(--text-primary)] text-base tabular-nums">
                       {hasHistory ? (
                         <div className="flex items-center gap-1">
@@ -200,15 +226,15 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         <span className="text-sm text-[var(--text-secondary)]">{formatUsd(valueUsd)}</span>
                       </div>
                     </TableCell>
-                    {/* Profit (收益 = 当前持有 - 净存入) */}
+                    {/* Profit (收益 = 当前持有 - 净存入量) */}
                     <TableCell className={`py-5 text-base tabular-nums ${
-                      profit !== null && profit > 0n
+                      profitValue !== null && profitValue > 0n
                         ? 'text-[var(--success)]'
-                        : profit !== null && profit < 0n
+                        : profitValue !== null && profitValue < 0n
                         ? 'text-[var(--error)]'
                         : 'text-[var(--text-secondary)]'
                     }`}>
-                      {hasHistory && profit !== null ? (
+                      {hasHistory && profitValue !== null ? (
                         <div className="flex items-center gap-1">
                           <TokenLogo
                             address={market.loanAsset.address}
@@ -216,7 +242,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                             logoURI={market.loanAsset.logoURI}
                             size="sm"
                           />
-                          <span>{profit >= 0n ? '+' : '-'}{profitFormatted}</span>
+                          <span>{profitValue >= 0n ? '+' : '-'}{profitFormatted}</span>
                         </div>
                       ) : (
                         <span>—</span>
