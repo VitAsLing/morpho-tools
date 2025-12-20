@@ -26,7 +26,7 @@ export const CHAIN_CONFIG: Record<number, ChainConfig> = {
     id: 42161,
     name: 'Arbitrum',
     shortName: 'Arbitrum',
-    morphoAddress: '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb' as Address,
+    morphoAddress: '0x6c247b1F6182318877311737BaC0844bAa518F5e' as Address,
     explorerUrl: 'https://arbiscan.io',
     morphoAppUrl: 'https://app.morpho.org/arbitrum',
     logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
