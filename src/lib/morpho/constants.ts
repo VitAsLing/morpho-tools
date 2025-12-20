@@ -3,6 +3,11 @@ import type { ChainConfig } from '@/types'
 
 export const MORPHO_GRAPHQL_API = 'https://blue-api.morpho.org/graphql'
 
+export const MORPHO_LOGO_URL = 'https://cdn.morpho.org/assets/logos/morpho.svg'
+
+// MORPHO token address on Ethereum mainnet (canonical, used for price)
+export const MORPHO_TOKEN_ADDRESS = '0x58D97B57BB95320F9a05dC918Aef65434969c2B2' as Address
+
 export const CHAIN_CONFIG: Record<number, ChainConfig> = {
   1: {
     id: 1,

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAccount, useChainId } from 'wagmi'
-import { fetchAllRewards, type AggregatedReward } from '@/lib/merkl/api'
+import { fetchAllRewards } from '@/lib/rewards'
+import type { AggregatedReward } from '@/types'
 
 export interface RewardsData {
   merkl: AggregatedReward[]

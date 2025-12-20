@@ -1,7 +1,7 @@
 import { useAccount } from 'wagmi'
 import { useRewards } from '@/hooks/useRewards'
 import { RewardsTable } from '@/components/rewards/RewardsTable'
-import type { AggregatedReward } from '@/lib/merkl/api'
+import type { AggregatedReward } from '@/types'
 
 export function Rewards() {
   const { isConnected } = useAccount()
