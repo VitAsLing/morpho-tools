@@ -51,6 +51,20 @@ export function formatTokenAmount(
   return result.replace(/\.?0+$/, '')
 }
 
+export function formatTokenAmountCompact(
+  amount: bigint,
+  decimals: number
+): string {
+  const value = Number(amount) / 10 ** decimals
+  const absValue = Math.abs(value)
+
+  if (absValue === 0) return '0'
+  if (absValue >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`
+  if (absValue >= 1_000) return `${(value / 1_000).toFixed(2)}K`
+  if (absValue >= 1) return value.toFixed(2)
+  return value.toPrecision(3)
+}
+
 export function parseTokenAmount(amount: string, decimals: number): bigint {
   // 移除空格
   const trimmed = amount.trim()
