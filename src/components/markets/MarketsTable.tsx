@@ -23,14 +23,40 @@ interface MarketsTableProps {
   error: Error | null
 }
 
+const MIN_SUPPLY_KEY = 'morpho-tools-min-supply'
+
 export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
   const chainId = useChainId()
   const chainConfig = getChainConfig(chainId)
   const [sortField, setSortField] = useState<SortField>('totalSupply')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [searchQuery, setSearchQuery] = useState('')
-  const [minSupply, setMinSupply] = useState(10)
+  const [minSupply, setMinSupply] = useState(() => {
+    try {
+      const saved = localStorage.getItem(MIN_SUPPLY_KEY)
+      if (saved) {
+        const value = Number(saved)
+        // 验证是有效数字且在合理范围内
+        if (!Number.isNaN(value) && value >= 0 && value <= 100) {
+          return value
+        }
+      }
+    } catch {
+      // localStorage 不可用时忽略
+    }
+    return 10
+  })
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null)
+
+  const handleMinSupplyChange = (value: number[]) => {
+    const newValue = value[0]
+    setMinSupply(newValue)
+    try {
+      localStorage.setItem(MIN_SUPPLY_KEY, String(newValue))
+    } catch {
+      // localStorage 不可用时忽略
+    }
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -153,7 +179,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
           <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Min Supply:</span>
           <Slider
             value={[minSupply]}
-            onValueChange={(value) => setMinSupply(value[0])}
+            onValueChange={handleMinSupplyChange}
             min={0}
             max={100}
             step={10}
@@ -202,7 +228,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
               <SortHeader field="netApy" className="w-[120px]">
                 Net APY
               </SortHeader>
-              <TableHead className="text-base normal-case tracking-normal w-[80px]">
+              <TableHead className="text-base normal-case tracking-normal w-[100px] sticky right-0 bg-[var(--bg-primary)]">
                 Action
               </TableHead>
             </TableRow>
@@ -268,7 +294,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         className="group flex items-center gap-2"
                       >
                         <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 whitespace-nowrap">
                             <TokenLogo
                               address={market.loanAsset.address}
                               symbol={market.loanAsset.symbol}
@@ -280,7 +306,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                             </span>
                           </div>
                           {market.collateralAsset && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                               <TokenLogo
                                 address={market.collateralAsset.address}
                                 symbol={market.collateralAsset.symbol}
@@ -320,7 +346,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         loanTokenLogoURI={market.loanAsset.logoURI}
                       />
                     </TableCell>
-                    <TableCell className="py-5">
+                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)]">
                       <Button onClick={() => setSelectedMarket(market)} className="w-24">
                         Supply
                       </Button>

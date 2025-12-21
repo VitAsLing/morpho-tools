@@ -40,25 +40,25 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
               <TableHead className="text-base normal-case tracking-normal w-[140px]">
                 Market
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[80px]">
+              <TableHead className="text-base normal-case tracking-normal w-[160px]">
                 Average
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[160px]">
                 Position
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[80px]">
+              <TableHead className="text-base normal-case tracking-normal w-[140px]">
                 Profit
               </TableHead>
               <TableHead className="text-base normal-case tracking-normal w-[80px]">
                 Utilization
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[60px]">
+              <TableHead className="text-base normal-case tracking-normal w-[70px]">
                 LLTV
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[100px]">
+              <TableHead className="text-base normal-case tracking-normal w-[110px]">
                 Net APY
               </TableHead>
-              <TableHead className="text-base normal-case tracking-normal w-[80px]">
+              <TableHead className="text-base normal-case tracking-normal w-[100px] sticky right-0 bg-[var(--bg-primary)]">
                 Action
               </TableHead>
             </TableRow>
@@ -103,10 +103,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
               positions.map((position) => {
                 const market = position.market
                 const currentTokens = BigInt(position.supplyAssets)
-                const supplyAmount = formatTokenAmount(
-                  currentTokens,
-                  market.loanAsset.decimals
-                )
+                const supplyAmount = formatTokenAmount(currentTokens, market.loanAsset.decimals)
                 const valueUsd =
                   (Number(position.supplyAssets) / 10 ** market.loanAsset.decimals) *
                   (market.loanAsset.priceUsd ?? 0)
@@ -174,7 +171,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                         className="group flex items-center gap-2"
                       >
                         <div className="flex flex-col gap-0.5 min-h-[52px] justify-center">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 whitespace-nowrap">
                             <TokenLogo
                               address={market.loanAsset.address}
                               symbol={market.loanAsset.symbol}
@@ -186,7 +183,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                             </span>
                           </div>
                           {market.collateralAsset && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                               <TokenLogo
                                 address={market.collateralAsset.address}
                                 symbol={market.collateralAsset.symbol}
@@ -281,7 +278,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                       />
                     </TableCell>
                     {/* Action */}
-                    <TableCell className="py-5">
+                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)]">
                       <Button onClick={() => setSelectedPosition(position)} className="w-24">
                         Withdraw
                       </Button>
