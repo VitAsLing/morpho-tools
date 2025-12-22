@@ -6,7 +6,7 @@ export function Markets() {
 
   return (
     <div>
-      <div style={{ height: '66px' }} />
+      <div className="h-16 md:h-[66px]" />
       <MarketsTable markets={markets ?? []} isLoading={isLoading} error={error as Error | null} />
     </div>
   )

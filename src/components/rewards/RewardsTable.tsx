@@ -1,5 +1,6 @@
 import { TokenLogo } from '@/components/common/TokenLogo'
 import { Button } from '@/components/ui/button'
+import { TableLoading, TableEmpty, TableError, REWARDS_SKELETON_COLUMNS } from '@/components/ui/TableState'
 import {
   Table,
   TableHeader,
@@ -8,6 +9,7 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
+import { ScrollHint } from '@/components/ui/ScrollHint'
 import { formatTokenAmount, formatUsd } from '@/lib/utils'
 import type { AggregatedReward } from '@/types'
 import type { RewardsData } from '@/hooks/useRewards'
@@ -48,7 +50,7 @@ export function RewardsTable({
   return (
     <div>
       {/* Summary */}
-      <div className="flex items-center justify-end gap-6" style={{ height: '36px', marginBottom: '10px' }}>
+      <div className="flex items-center justify-end gap-6 h-9 mb-2.5">
         <div className="flex items-center gap-2">
           <span className="text-[var(--text-secondary)]">Claimable:</span>
           <span className="text-[var(--success)] font-semibold">{formatUsd(totalClaimableNowUsd)}</span>
@@ -60,7 +62,7 @@ export function RewardsTable({
       </div>
 
       {/* Rewards Table */}
-      <div className="overflow-x-auto" style={{ minHeight: '300px' }}>
+      <ScrollHint className="min-h-[300px]">
         <Table className="table-fixed-layout">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -83,40 +85,20 @@ export function RewardsTable({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="text-center py-12">
-                  <div className="flex items-center justify-center gap-2 text-[var(--text-secondary)]">
-                    <svg className="w-5 h-5 spinner" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading rewards...
-                  </div>
-                </TableCell>
-              </TableRow>
+              <TableLoading columns={REWARDS_SKELETON_COLUMNS} />
             ) : error ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="text-center py-12 text-[var(--error)]">
-                  Failed to load rewards. Please try again.
-                </TableCell>
-              </TableRow>
+              <TableError colSpan={5} message="Failed to load rewards. Please try again." />
             ) : allRewards.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="text-center py-12 text-[var(--text-secondary)]">
-                  No rewards found. Supply to incentivized markets to earn rewards.
-                </TableCell>
-              </TableRow>
+              <TableEmpty
+                colSpan={5}
+                title="No rewards yet"
+                description="Supply to incentivized markets to earn rewards."
+                icon={
+                  <svg className="table-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
+              />
             ) : (
               allRewards.map((reward) => {
                 const decimals = reward.tokenDecimals
@@ -192,7 +174,7 @@ export function RewardsTable({
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollHint>
     </div>
   )
 }

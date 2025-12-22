@@ -5,6 +5,7 @@ import { ApyDisplay } from './ApyDisplay'
 import { SupplyModal } from './SupplyModal'
 import { TokenLogo } from '@/components/common/TokenLogo'
 import { Button } from '@/components/ui/button'
+import { TableLoading, TableEmpty, TableError, MARKETS_SKELETON_COLUMNS } from '@/components/ui/TableState'
 import {
   Table,
   TableHeader,
@@ -14,7 +15,8 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Slider } from '@/components/ui/slider'
-import { formatUsd, formatPercent, getMarketUrl } from '@/lib/utils'
+import { ScrollHint } from '@/components/ui/ScrollHint'
+import { formatUsd, formatPercent, getMarketUrl, calculateUsdValue } from '@/lib/utils'
 import { getChainConfig } from '@/lib/morpho/constants'
 
 interface MarketsTableProps {
@@ -113,10 +115,14 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
       // 排除没有抵押品或 LLTV 为 0 的市场（idle market）
       if (!m.collateralAsset || Number(m.lltv) === 0) return false
 
-      const supplyUsd =
-        (Number(m.state.supplyAssets) / 10 ** m.loanAsset.decimals) *
-        (m.loanAsset.priceUsd ?? 0)
+      const supplyUsd = calculateUsdValue(m.state.supplyAssets, m.loanAsset.decimals, m.loanAsset.priceUsd)
       return supplyUsd >= minSupply * 1_000_000
+    })
+
+    // Helper to get market USD values for sorting
+    const getMarketValues = (m: Market) => ({
+      supplyUsd: calculateUsdValue(m.state.supplyAssets, m.loanAsset.decimals, m.loanAsset.priceUsd),
+      borrowUsd: calculateUsdValue(m.state.borrowAssets, m.loanAsset.decimals, m.loanAsset.priceUsd),
     })
 
     result.sort((a, b) => {
@@ -128,32 +134,23 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
           aValue = a.loanAsset.symbol.localeCompare(b.loanAsset.symbol)
           bValue = 0
           break
-        case 'totalSupply':
-          aValue =
-            (Number(a.state.supplyAssets) / 10 ** a.loanAsset.decimals) *
-            (a.loanAsset.priceUsd ?? 0)
-          bValue =
-            (Number(b.state.supplyAssets) / 10 ** b.loanAsset.decimals) *
-            (b.loanAsset.priceUsd ?? 0)
+        case 'totalSupply': {
+          aValue = getMarketValues(a).supplyUsd
+          bValue = getMarketValues(b).supplyUsd
           break
-        case 'totalBorrow':
-          aValue =
-            (Number(a.state.borrowAssets) / 10 ** a.loanAsset.decimals) *
-            (a.loanAsset.priceUsd ?? 0)
-          bValue =
-            (Number(b.state.borrowAssets) / 10 ** b.loanAsset.decimals) *
-            (b.loanAsset.priceUsd ?? 0)
+        }
+        case 'totalBorrow': {
+          aValue = getMarketValues(a).borrowUsd
+          bValue = getMarketValues(b).borrowUsd
           break
-        case 'liquidity':
-          aValue =
-            ((Number(a.state.supplyAssets) - Number(a.state.borrowAssets)) /
-              10 ** a.loanAsset.decimals) *
-            (a.loanAsset.priceUsd ?? 0)
-          bValue =
-            ((Number(b.state.supplyAssets) - Number(b.state.borrowAssets)) /
-              10 ** b.loanAsset.decimals) *
-            (b.loanAsset.priceUsd ?? 0)
+        }
+        case 'liquidity': {
+          const aVals = getMarketValues(a)
+          const bVals = getMarketValues(b)
+          aValue = aVals.supplyUsd - aVals.borrowUsd
+          bValue = bVals.supplyUsd - bVals.borrowUsd
           break
+        }
         case 'utilization':
           aValue = a.state.utilization
           bValue = b.state.utilization
@@ -204,7 +201,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4" style={{ height: '36px', marginBottom: '10px' }}>
+      <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4 h-9 mb-2.5">
         <div className="flex items-center gap-3">
           <span className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-nowrap">Min Supply:</span>
           <Slider
@@ -219,7 +216,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto" style={{ minHeight: '400px' }}>
+      <ScrollHint className="min-h-[400px]">
         <Table className="table-fixed-layout">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -265,48 +262,19 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12">
-                  <div className="flex items-center justify-center gap-2 text-[var(--text-secondary)]">
-                    <svg className="w-5 h-5 spinner" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading markets...
-                  </div>
-                </TableCell>
-              </TableRow>
+              <TableLoading columns={MARKETS_SKELETON_COLUMNS} />
             ) : error ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12 text-[var(--error)]">
-                  Failed to load markets. Please try again.
-                </TableCell>
-              </TableRow>
+              <TableError colSpan={8} message="Failed to load markets. Please try again." />
             ) : filteredAndSortedMarkets.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12 text-[var(--text-secondary)]">
-                  No markets found.
-                </TableCell>
-              </TableRow>
+              <TableEmpty
+                colSpan={8}
+                title="No markets found"
+                description="Try adjusting your search or filter settings."
+              />
             ) : (
               filteredAndSortedMarkets.map((market) => {
-                const totalSupplyUsd =
-                  (Number(market.state.supplyAssets) / 10 ** market.loanAsset.decimals) *
-                  (market.loanAsset.priceUsd ?? 0)
-                const totalBorrowUsd =
-                  (Number(market.state.borrowAssets) / 10 ** market.loanAsset.decimals) *
-                  (market.loanAsset.priceUsd ?? 0)
+                const totalSupplyUsd = calculateUsdValue(market.state.supplyAssets, market.loanAsset.decimals, market.loanAsset.priceUsd)
+                const totalBorrowUsd = calculateUsdValue(market.state.borrowAssets, market.loanAsset.decimals, market.loanAsset.priceUsd)
                 const liquidityUsd = totalSupplyUsd - totalBorrowUsd
 
                 return (
@@ -376,7 +344,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
                         loanTokenLogoURI={market.loanAsset.logoURI}
                       />
                     </TableCell>
-                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)]">
+                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)] transition-colors duration-150 group-hover:bg-[var(--bg-tertiary)]">
                       <Button onClick={() => setSelectedMarket(market)} className="w-24">
                         Supply
                       </Button>
@@ -387,7 +355,7 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollHint>
 
       {selectedMarket && (
         <SupplyModal market={selectedMarket} onClose={() => setSelectedMarket(null)} />

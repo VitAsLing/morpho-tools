@@ -8,9 +8,9 @@ export function Positions() {
 
   return (
     <div>
-      <div style={{ height: '66px' }} />
+      <div className="h-16 md:h-[66px]" />
       {!isConnected ? (
-        <div className="text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <div className="text-center py-20">
           <p className="text-[var(--text-secondary)] text-lg">
             Connect your wallet to view your positions.
           </p>
