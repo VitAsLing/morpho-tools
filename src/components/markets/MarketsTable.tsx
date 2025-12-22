@@ -24,12 +24,34 @@ interface MarketsTableProps {
 }
 
 const MIN_SUPPLY_KEY = 'morpho-tools-min-supply'
+const SORT_FIELD_KEY = 'morpho-tools-markets-sort-field'
+const SORT_DIRECTION_KEY = 'morpho-tools-markets-sort-direction'
 
 export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
   const chainId = useChainId()
   const chainConfig = getChainConfig(chainId)
-  const [sortField, setSortField] = useState<SortField>('totalSupply')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [sortField, setSortField] = useState<SortField>(() => {
+    try {
+      const saved = localStorage.getItem(SORT_FIELD_KEY)
+      if (saved && ['market', 'totalSupply', 'totalBorrow', 'liquidity', 'utilization', 'lltv', 'netApy'].includes(saved)) {
+        return saved as SortField
+      }
+    } catch {
+      // localStorage 不可用时忽略
+    }
+    return 'totalSupply'
+  })
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+    try {
+      const saved = localStorage.getItem(SORT_DIRECTION_KEY)
+      if (saved === 'asc' || saved === 'desc') {
+        return saved
+      }
+    } catch {
+      // localStorage 不可用时忽略
+    }
+    return 'desc'
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [minSupply, setMinSupply] = useState(() => {
     try {
@@ -59,11 +81,19 @@ export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
   }
 
   const handleSort = (field: SortField) => {
+    let newDirection: SortDirection = 'desc'
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+      newDirection = sortDirection === 'asc' ? 'desc' : 'asc'
+      setSortDirection(newDirection)
     } else {
       setSortField(field)
       setSortDirection('desc')
+    }
+    try {
+      localStorage.setItem(SORT_FIELD_KEY, field)
+      localStorage.setItem(SORT_DIRECTION_KEY, sortField === field ? newDirection : 'desc')
+    } catch {
+      // localStorage 不可用时忽略
     }
   }
 
