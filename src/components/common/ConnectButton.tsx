@@ -24,7 +24,7 @@ export function ConnectButton() {
       onClick={openAccountModal}
       className="gap-2 hover:border-[var(--accent)]"
     >
-      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shrink-0" />
+      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--accent)] to-purple-500 shrink-0" />
       <span className="text-sm">{formatAddress(address)}</span>
     </Button>
   )

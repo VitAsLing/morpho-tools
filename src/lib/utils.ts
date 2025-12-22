@@ -30,6 +30,22 @@ export function formatPercent(value: number): string {
   return `${(value * 100).toFixed(2)}%`
 }
 
+/**
+ * Calculate USD value from token amount
+ * @param assets - Token amount in smallest unit (bigint or number as string)
+ * @param decimals - Token decimals
+ * @param priceUsd - Token price in USD (can be null/undefined)
+ * @returns USD value as number
+ */
+export function calculateUsdValue(
+  assets: bigint | string | number,
+  decimals: number,
+  priceUsd: number | null | undefined
+): number {
+  const amount = typeof assets === 'bigint' ? assets : BigInt(assets)
+  return (Number(amount) / 10 ** decimals) * (priceUsd ?? 0)
+}
+
 export function formatTokenAmount(
   amount: bigint,
   decimals: number,

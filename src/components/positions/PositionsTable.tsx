@@ -5,6 +5,7 @@ import { ApyDisplay } from '../markets/ApyDisplay'
 import { WithdrawModal } from './WithdrawModal'
 import { TokenLogo } from '@/components/common/TokenLogo'
 import { Button } from '@/components/ui/button'
+import { TableLoading, TableEmpty, TableError, POSITIONS_SKELETON_COLUMNS } from '@/components/ui/TableState'
 import {
   Table,
   TableHeader,
@@ -13,7 +14,8 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import { formatUsd, formatTokenAmount, formatPercent, getMarketUrl } from '@/lib/utils'
+import { ScrollHint } from '@/components/ui/ScrollHint'
+import { formatUsd, formatTokenAmount, formatPercent, getMarketUrl, calculateUsdValue } from '@/lib/utils'
 import { getChainConfig } from '@/lib/morpho/constants'
 import { calculateCostBasis, calculateProfit } from '@/lib/transactionStore'
 
@@ -32,8 +34,8 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
   return (
     <div>
       {/* Spacer to match Markets filter section height */}
-      <div style={{ height: '46px' }} />
-      <div className="overflow-x-auto" style={{ minHeight: '400px' }}>
+      <div className="h-[46px]" />
+      <ScrollHint className="min-h-[400px]">
         <Table className="table-fixed-layout">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -65,48 +67,21 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12">
-                  <div className="flex items-center justify-center gap-2 text-[var(--text-secondary)]">
-                    <svg className="w-5 h-5 spinner" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading positions...
-                  </div>
-                </TableCell>
-              </TableRow>
+              <TableLoading columns={POSITIONS_SKELETON_COLUMNS} />
             ) : error ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12 text-[var(--error)]">
-                  Failed to load positions. Please try again.
-                </TableCell>
-              </TableRow>
+              <TableError colSpan={8} message="Failed to load positions. Please try again." />
             ) : positions.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-12 text-[var(--text-secondary)]">
-                  No positions found. Supply to a market to see your positions here.
-                </TableCell>
-              </TableRow>
+              <TableEmpty
+                colSpan={8}
+                title="No positions yet"
+                description="Supply to a market to see your positions here."
+              />
             ) : (
               positions.map((position) => {
                 const market = position.market
                 const currentTokens = BigInt(position.supplyAssets)
                 const supplyAmount = formatTokenAmount(currentTokens, market.loanAsset.decimals)
-                const valueUsd =
-                  (Number(position.supplyAssets) / 10 ** market.loanAsset.decimals) *
-                  (market.loanAsset.priceUsd ?? 0)
+                const valueUsd = calculateUsdValue(position.supplyAssets, market.loanAsset.decimals, market.loanAsset.priceUsd)
 
                 // 优先使用 API 交易数据计算，否则回退到本地存储
                 const apiProfitData = position.profitData
@@ -278,7 +253,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
                       />
                     </TableCell>
                     {/* Action */}
-                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)]">
+                    <TableCell className="py-5 sticky right-0 bg-[var(--bg-primary)] transition-colors duration-150 group-hover:bg-[var(--bg-tertiary)]">
                       <Button onClick={() => setSelectedPosition(position)} className="w-24">
                         Withdraw
                       </Button>
@@ -289,7 +264,7 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollHint>
 
       {selectedPosition && (
         <WithdrawModal
