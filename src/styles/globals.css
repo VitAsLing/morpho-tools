@@ -239,8 +239,8 @@ body {
 .modal-content {
   background: linear-gradient(
     145deg,
-    rgba(18, 18, 26, 0.95) 0%,
-    rgba(26, 26, 36, 0.9) 100%
+    rgba(18, 18, 26, 1) 0%,
+    rgba(26, 26, 36, 1) 100%
   );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -261,8 +261,8 @@ body {
 :root.light .modal-content {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(248, 249, 250, 0.9) 100%
+    rgba(255, 255, 255, 1) 0%,
+    rgba(248, 249, 250, 1) 100%
   );
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow:
