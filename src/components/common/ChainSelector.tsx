@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useChainId, useSwitchChain } from 'wagmi'
-import { mainnet, base, arbitrum } from 'wagmi/chains'
+import { mainnet, base, arbitrum, hyperEvm } from 'wagmi/chains'
 import { Button } from '@/components/ui/button'
 
-const chains = [mainnet, base, arbitrum]
+const chains = [mainnet, base, arbitrum, hyperEvm]
 
 const chainLogos: Record<number, string> = {
   [mainnet.id]: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
   [base.id]: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png',
   [arbitrum.id]: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
+  [hyperEvm.id]: 'https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png',
 }
 
 export function ChainSelector() {

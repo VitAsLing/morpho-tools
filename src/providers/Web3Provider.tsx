@@ -1,5 +1,5 @@
 import { WagmiProvider, http, fallback, createConfig } from 'wagmi'
-import { mainnet, base, arbitrum } from 'wagmi/chains'
+import { mainnet, base, arbitrum, hyperEvm } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit'
 import {
@@ -41,7 +41,7 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
   connectors,
-  chains: [mainnet, base, arbitrum],
+  chains: [mainnet, base, arbitrum, hyperEvm],
   transports: {
     [mainnet.id]: fallback([
       http('https://eth.llamarpc.com'),
@@ -58,6 +58,10 @@ const config = createConfig({
     [arbitrum.id]: fallback([
       http('https://arb1.arbitrum.io/rpc'),
       http('https://1rpc.io/arb'),
+      http(),
+    ]),
+    [hyperEvm.id]: fallback([
+      http('https://rpc.hyperliquid.xyz/evm'),
       http(),
     ]),
   },
