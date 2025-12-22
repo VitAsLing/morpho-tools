@@ -36,6 +36,15 @@ export const CHAIN_CONFIG: Record<number, ChainConfig> = {
     morphoAppUrl: 'https://app.morpho.org/arbitrum',
     logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
   },
+  999: {
+    id: 999,
+    name: 'HyperEVM',
+    shortName: 'HyperEVM',
+    morphoAddress: '0x68e37dE8d93d3496ae143F2E900490f6280C57cD' as Address,
+    explorerUrl: 'https://hyperevmscan.io',
+    morphoAppUrl: 'https://app.morpho.org/hyperevm',
+    logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/32196.png',
+  },
 }
 
 export const SUPPORTED_CHAINS = Object.values(CHAIN_CONFIG)
