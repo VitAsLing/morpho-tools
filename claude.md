@@ -1,5 +1,13 @@
 # Morpho Tools - Claude 项目指南
 
+## ⚠️ 重要规则
+
+**Git 操作必须二次确认**：
+- 执行 `git commit` 前必须先询问用户确认
+- 执行 `git push` 前必须先询问用户确认
+- 执行任何破坏性 git 操作（如 `force push`、`reset`、`rebase`）前必须先询问用户确认
+- 永远不要在没有用户明确同意的情况下自动提交或推送代码
+
 ## 项目概述
 
 Morpho Tools 是一个现代化的 Web3 DeFi 应用，为 Morpho Blue 借贷协议提供用户界面。支持用户在多条区块链上浏览市场、管理供应头寸和追踪奖励。
