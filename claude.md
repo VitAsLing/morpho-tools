@@ -230,28 +230,53 @@ bun run lint:fix     # 自动修复
 
 1. **更新常量** (`src/lib/morpho/constants.ts`):
    ```typescript
-   // 添加链配置
+   // 1. 如果是自定义链，添加 Chain 定义
+   export const newChain: Chain = {
+     id: NEW_CHAIN_ID,
+     name: 'NewChain',
+     nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+     rpcUrls: { default: { http: ['https://rpc.newchain.com'] } },
+     blockExplorers: { default: { name: 'NewChain Scan', url: 'https://scan.newchain.com' } },
+   }
+
+   // 2. 添加 RPC URL
+   export const RPC_URLS: Record<number, string[]> = {
+     // ...existing
+     [NEW_CHAIN_ID]: ['https://rpc.newchain.com'],
+   }
+
+   // 3. 添加到 CHAIN_MAP
+   export const CHAIN_MAP: Record<number, Chain> = {
+     // ...existing
+     [NEW_CHAIN_ID]: newChain,
+   }
+
+   // 4. 添加链配置
    export const CHAIN_CONFIG: Record<number, ChainConfig> = {
+     // ...existing
      [NEW_CHAIN_ID]: {
+       id: NEW_CHAIN_ID,
        name: 'NewChain',
-       morphoAddress: '0x...',
-       explorerUrl: 'https://...',
-       rpcUrls: ['https://...'],
+       shortName: 'NewChain',
+       morphoAddress: '0x...' as Address,
+       explorerUrl: 'https://scan.newchain.com',
+       morphoAppUrl: 'https://app.morpho.org/newchain',
+       logo: '/chain/newchain.png',
      },
-     // ...
    }
    ```
 
 2. **更新 Web3Provider** (`src/providers/Web3Provider.tsx`):
-   - 导入新链
+   - 从 constants 导入新链: `import { RPC_URLS, newChain } from '@/lib/morpho/constants'`
    - 添加到 `chains` 数组
-   - 配置 RPC transports
+   - transports 会自动使用 `RPC_URLS` 配置
 
-3. **添加链图标** (`public/chains/`):
-   - 添加 `newchain.svg` 或 `newchain.png`
+3. **添加链图标** (`public/chain/`):
+   - 添加 `newchain.png`
 
 4. **更新 ChainSelector** (`src/components/common/ChainSelector.tsx`):
-   - 确保支持新链的显示
+   - 从 constants 导入新链
+   - 添加到 `chains` 数组和 `chainLogos` 映射
 
 ### 添加新的 UI 组件
 

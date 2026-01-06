@@ -9,7 +9,7 @@ A modern web interface for interacting with [Morpho Blue](https://morpho.org/) l
 - **Markets** - Browse and supply to Morpho Blue lending markets with real-time APY data
 - **Positions** - View and manage your supply positions across all chains
 - **Rewards** - Track and claim Merkl and Morpho rewards
-- **Multi-chain** - Support for Ethereum, Base, and Arbitrum
+- **Multi-chain** - Support for Ethereum, Base, Arbitrum, and HyperEVM
 - **Wallet Connect** - Browser extension wallets and Coinbase Wallet via RainbowKit
 - **Dark/Light Theme** - Toggle between themes
 
@@ -108,7 +108,7 @@ This project is configured for deployment on Cloudflare Pages.
 
 - **Morpho GraphQL API** - Market and position data
 - **Merkl API** - Rewards data
-- **Public RPC Endpoints** - Blockchain interactions (LlamaRPC, Ankr)
+- **Public RPC Endpoints** - Blockchain interactions (Cloudflare, official chain RPCs)
 
 ## License
 
