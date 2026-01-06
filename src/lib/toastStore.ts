@@ -1,6 +1,6 @@
 type ToastType = 'success' | 'error' | 'info'
 
-interface Toast {
+export interface Toast {
   id: string
   type: ToastType
   message: string

@@ -1,7 +1,47 @@
 import type { Address } from 'viem'
+import type { Chain } from 'viem'
+import { mainnet, base, arbitrum } from 'viem/chains'
 import type { ChainConfig } from '@/types'
 
 export const MORPHO_GRAPHQL_API = 'https://blue-api.morpho.org/graphql'
+
+// HyperEVM chain 定义 (wagmi/viem 中可能没有)
+export const hyperEvm: Chain = {
+  id: 999,
+  name: 'HyperEVM',
+  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://rpc.hyperliquid.xyz/evm'] },
+  },
+  blockExplorers: {
+    default: { name: 'HyperEVM Scan', url: 'https://hyperevmscan.io' },
+  },
+}
+
+// RPC URLs 配置 - 使用官方节点
+export const RPC_URLS: Record<number, string[]> = {
+  1: ['https://cloudflare-eth.com'],
+  8453: ['https://mainnet.base.org'],
+  42161: ['https://arb1.arbitrum.io/rpc'],
+  999: ['https://rpc.hyperliquid.xyz/evm'],
+}
+
+// Chain 对象映射
+export const CHAIN_MAP: Record<number, Chain> = {
+  1: mainnet,
+  8453: base,
+  42161: arbitrum,
+  999: hyperEvm,
+}
+
+export function getChain(chainId: number): Chain | undefined {
+  return CHAIN_MAP[chainId]
+}
+
+export function getRpcUrl(chainId: number): string {
+  const urls = RPC_URLS[chainId]
+  return urls?.[0] ?? ''
+}
 
 export const MORPHO_LOGO_URL = 'https://cdn.morpho.org/assets/logos/morpho.svg'
 
@@ -47,16 +87,10 @@ export const CHAIN_CONFIG: Record<number, ChainConfig> = {
   },
 }
 
-export const SUPPORTED_CHAINS = Object.values(CHAIN_CONFIG)
-
 export const DEFAULT_CHAIN_ID = 1
 
 export function getChainConfig(chainId: number): ChainConfig {
   return CHAIN_CONFIG[chainId] ?? CHAIN_CONFIG[DEFAULT_CHAIN_ID]
-}
-
-export function getChainName(chainId: number): string {
-  return getChainConfig(chainId).name.toLowerCase()
 }
 
 export function getMorphoAddress(chainId: number): Address {

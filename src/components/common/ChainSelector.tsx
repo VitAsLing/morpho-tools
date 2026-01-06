@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useChainId, useSwitchChain } from 'wagmi'
-import { mainnet, base, arbitrum, hyperEvm } from 'wagmi/chains'
+import { mainnet, base, arbitrum } from 'wagmi/chains'
 import { Button } from '@/components/ui/button'
+import { hyperEvm } from '@/lib/morpho/constants'
 
 const chains = [mainnet, base, arbitrum, hyperEvm]
 
@@ -61,8 +62,12 @@ export function ChainSelector() {
               <Button
                 key={chain.id}
                 variant="ghost"
-                onClick={() => {
-                  switchChain({ chainId: chain.id })
+                onClick={async () => {
+                  try {
+                    await switchChain({ chainId: chain.id })
+                  } catch (error) {
+                    console.error('Failed to switch chain:', error)
+                  }
                   setIsOpen(false)
                 }}
                 className={`w-full gap-3 px-4 py-3 rounded-none ${

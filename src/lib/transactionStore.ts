@@ -98,12 +98,3 @@ export function calculateProfit(
   return currentTokens - costBasis.netDeposited
 }
 
-// 计算平均成本（这里返回净存入量，因为不追踪价格）
-export function getAverageDeposit(costBasis: MarketCostBasis): bigint {
-  return costBasis.netDeposited
-}
-
-export function clearTransactions(address: string, chainId: number): void {
-  const key = getStorageKey(address, chainId)
-  localStorage.removeItem(key)
-}

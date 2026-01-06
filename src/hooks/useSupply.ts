@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi'
+import { useAccount, useWriteContract, useChainId } from 'wagmi'
+import { createPublicClient, http } from 'viem'
 import { MORPHO_ABI } from '@/lib/morpho/abi'
-import { getMorphoAddress } from '@/lib/morpho/constants'
+import { getMorphoAddress, getChain, getRpcUrl } from '@/lib/morpho/constants'
 import type { MarketParams } from '@/types'
 
 export function useSupply() {
@@ -9,16 +10,17 @@ export function useSupply() {
   const chainId = useChainId()
   const morphoAddress = getMorphoAddress(chainId)
   const [supplyHash, setSupplyHash] = useState<`0x${string}` | undefined>()
+  const [isWaitingForSupply, setIsWaitingForSupply] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const { writeContractAsync, isPending: isSupplying, error: supplyError } = useWriteContract()
-
-  const { isLoading: isWaitingForSupply, isSuccess } = useWaitForTransactionReceipt({
-    hash: supplyHash,
-  })
 
   const supply = useCallback(
     async (marketParams: MarketParams, amount: bigint) => {
       if (!address) throw new Error('Wallet not connected')
+
+      const chain = getChain(chainId)
+      if (!chain) throw new Error('Unsupported chain')
 
       const hash = await writeContractAsync({
         address: morphoAddress,
@@ -40,13 +42,26 @@ export function useSupply() {
       })
 
       setSupplyHash(hash)
+      setIsWaitingForSupply(true)
+
+      // 用独立的 viem client 等待交易确认
+      const client = createPublicClient({
+        chain,
+        transport: http(getRpcUrl(chainId)),
+      })
+      await client.waitForTransactionReceipt({ hash })
+      setIsWaitingForSupply(false)
+      setIsSuccess(true)
+
       return hash
     },
-    [address, morphoAddress, writeContractAsync]
+    [address, chainId, morphoAddress, writeContractAsync]
   )
 
   const reset = useCallback(() => {
     setSupplyHash(undefined)
+    setIsWaitingForSupply(false)
+    setIsSuccess(false)
   }, [])
 
   return {

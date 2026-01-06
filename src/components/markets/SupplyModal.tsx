@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAccount, useChainId } from 'wagmi'
-import { maxUint256 } from 'viem'
 import type { Market, MarketParams } from '@/types'
 import { useTokenApproval } from '@/hooks/useTokenApproval'
 import { useSupply } from '@/hooks/useSupply'
@@ -91,7 +90,7 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
   const handleApprove = async () => {
     try {
       setApprovalState('pending')
-      const hash = await approve(maxUint256)
+      const hash = await approve(parsedAmount)
       if (hash) {
         setApprovalState('success')
         addToast('success', 'Approved successfully', {
