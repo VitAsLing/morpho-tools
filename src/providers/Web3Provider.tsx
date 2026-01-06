@@ -10,7 +10,24 @@ import {
 } from '@rainbow-me/rainbowkit/wallets'
 import type { ReactNode } from 'react'
 import '@rainbow-me/rainbowkit/styles.css'
-import { RPC_URLS, hyperEvm } from '@/lib/morpho/constants'
+import { RPC_URLS, hyperEvm, CHAIN_MAP } from '@/lib/morpho/constants'
+
+const CHAIN_STORAGE_KEY = 'morpho-tools-chain'
+
+export function getStoredChainId(): number {
+  if (typeof window === 'undefined') return mainnet.id
+  const stored = localStorage.getItem(CHAIN_STORAGE_KEY)
+  if (stored) {
+    const chainId = parseInt(stored, 10)
+    if (CHAIN_MAP[chainId]) return chainId
+  }
+  return mainnet.id // 默认 ETH 链
+}
+
+export function setStoredChainId(chainId: number): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(CHAIN_STORAGE_KEY, chainId.toString())
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,10 +83,14 @@ const config = createConfig({
 })
 
 export function Web3Provider({ children }: { children: ReactNode }) {
+  const initialChainId = getStoredChainId()
+  const initialChain = CHAIN_MAP[initialChainId] || base
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
+          initialChain={initialChain}
           theme={darkTheme({
             accentColor: '#3b82f6',
             accentColorForeground: 'white',
