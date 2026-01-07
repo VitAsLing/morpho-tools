@@ -100,7 +100,8 @@ src/
 │   └── Rewards.tsx             # 奖励追踪页
 │
 ├── providers/
-│   └── Web3Provider.tsx        # Web3 上下文（Wagmi + RainbowKit + Query）
+│   ├── Web3Provider.tsx        # Web3 上下文（Wagmi + RainbowKit + Query）
+│   └── ChainProvider.tsx       # 链选择状态管理（统一钱包连接/未连接时的链选择）
 │
 ├── types/
 │   └── index.ts                # TypeScript 类型定义
@@ -287,11 +288,14 @@ bun run lint:fix     # 自动修复
 ### 添加新的数据 Hook
 
 1. 在 `src/hooks/` 创建 hook 文件
-2. 使用 TanStack Query 进行数据获取:
+2. 使用 TanStack Query + `useSelectedChainId` 进行数据获取:
    ```typescript
    import { useQuery } from '@tanstack/react-query'
+   import { useSelectedChainId } from '@/providers/ChainProvider'
 
-   export function useNewData(chainId: number) {
+   export function useNewData() {
+     const chainId = useSelectedChainId()
+
      return useQuery({
        queryKey: ['newData', chainId],
        queryFn: () => fetchNewData(chainId),
@@ -375,6 +379,8 @@ Vite 配置 (`vite.config.ts`) 包含:
 3. **错误处理**: 所有 API 调用需要 try-catch 和用户友好的错误提示
 4. **主题兼容**: 新组件需要支持深色/浅色主题
 5. **响应式**: 组件需要在移动端正常显示
+6. **链选择**: 使用 `useSelectedChainId()` 而不是 wagmi 的 `useChainId()`，确保未连接钱包时切换链也能正常工作
+7. **交易状态**: 交易 hooks 返回 `isSigning`（等待钱包确认）和 `isConfirming`（等待区块确认）两个独立状态，需检查 `receipt.status` 确认交易成功
 
 ## 关键文件快速索引
 
@@ -387,3 +393,4 @@ Vite 配置 (`vite.config.ts`) 包含:
 | 添加合约交互 | `src/lib/morpho/abi.ts`, `src/hooks/useSupply.ts` |
 | 格式化工具 | `src/lib/utils.ts` |
 | 类型定义 | `src/types/index.ts` |
+| 链选择状态 | `src/providers/ChainProvider.tsx` |
