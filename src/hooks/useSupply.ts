@@ -1,19 +1,21 @@
 import { useState, useCallback } from 'react'
-import { useAccount, useWriteContract, useChainId } from 'wagmi'
+import { useAccount, useWriteContract } from 'wagmi'
 import { createPublicClient, http } from 'viem'
 import { MORPHO_ABI } from '@/lib/morpho/abi'
 import { getMorphoAddress, getChain, getRpcUrl } from '@/lib/morpho/constants'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 import type { MarketParams } from '@/types'
 
 export function useSupply() {
   const { address } = useAccount()
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
   const morphoAddress = getMorphoAddress(chainId)
   const [supplyHash, setSupplyHash] = useState<`0x${string}` | undefined>()
-  const [isWaitingForSupply, setIsWaitingForSupply] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [txError, setTxError] = useState<string | undefined>()
 
-  const { writeContractAsync, isPending: isSupplying, error: supplyError } = useWriteContract()
+  const { writeContractAsync, isPending: isSigning } = useWriteContract()
 
   const supply = useCallback(
     async (marketParams: MarketParams, amount: bigint) => {
@@ -22,53 +24,76 @@ export function useSupply() {
       const chain = getChain(chainId)
       if (!chain) throw new Error('Unsupported chain')
 
-      const hash = await writeContractAsync({
-        address: morphoAddress,
-        abi: MORPHO_ABI,
-        functionName: 'supply',
-        args: [
-          {
-            loanToken: marketParams.loanToken,
-            collateralToken: marketParams.collateralToken,
-            oracle: marketParams.oracle,
-            irm: marketParams.irm,
-            lltv: marketParams.lltv,
-          },
-          amount,
-          0n,
-          address,
-          '0x' as `0x${string}`,
-        ],
-      })
+      setTxError(undefined)
+      setSupplyHash(undefined)
+      setIsSuccess(false)
 
-      setSupplyHash(hash)
-      setIsWaitingForSupply(true)
+      try {
+        // 阶段1: 等待钱包签名
+        const hash = await writeContractAsync({
+          address: morphoAddress,
+          abi: MORPHO_ABI,
+          functionName: 'supply',
+          args: [
+            {
+              loanToken: marketParams.loanToken,
+              collateralToken: marketParams.collateralToken,
+              oracle: marketParams.oracle,
+              irm: marketParams.irm,
+              lltv: marketParams.lltv,
+            },
+            amount,
+            0n,
+            address,
+            '0x' as `0x${string}`,
+          ],
+        })
 
-      // 用独立的 viem client 等待交易确认
-      const client = createPublicClient({
-        chain,
-        transport: http(getRpcUrl(chainId)),
-      })
-      await client.waitForTransactionReceipt({ hash })
-      setIsWaitingForSupply(false)
-      setIsSuccess(true)
+        setSupplyHash(hash)
+        setIsConfirming(true)
 
-      return hash
+        // 阶段2: 等待区块确认
+        const client = createPublicClient({
+          chain,
+          transport: http(getRpcUrl(chainId)),
+        })
+        const receipt = await client.waitForTransactionReceipt({ hash })
+        setIsConfirming(false)
+
+        // 检查交易是否成功
+        if (receipt.status === 'reverted') {
+          setTxError('Transaction reverted')
+          throw new Error('Transaction reverted')
+        }
+
+        setIsSuccess(true)
+        return hash
+      } catch (error) {
+        setIsConfirming(false)
+        const message = error instanceof Error ? error.message : 'Supply failed'
+        // 用户取消不设置错误状态
+        if (!message.toLowerCase().includes('user rejected') && !message.toLowerCase().includes('user denied')) {
+          setTxError(message)
+        }
+        throw error
+      }
     },
     [address, chainId, morphoAddress, writeContractAsync]
   )
 
   const reset = useCallback(() => {
     setSupplyHash(undefined)
-    setIsWaitingForSupply(false)
+    setIsConfirming(false)
     setIsSuccess(false)
+    setTxError(undefined)
   }, [])
 
   return {
     supply,
-    isSupplying: isSupplying || isWaitingForSupply,
+    isSigning,
+    isConfirming,
     isSuccess,
-    error: supplyError,
+    error: txError,
     hash: supplyHash,
     reset,
   }

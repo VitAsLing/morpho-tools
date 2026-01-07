@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAccount, useChainId } from 'wagmi'
+import { useAccount } from 'wagmi'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 import { fetchUserPositions, fetchUserTransactions } from '@/lib/morpho/api'
 import { calculatePositionProfit } from '@/lib/utils'
 import type { UserPosition, UserTransaction, PositionProfitData } from '@/types'
@@ -10,7 +11,7 @@ export interface EnrichedUserPosition extends UserPosition {
 
 export function useUserPositions() {
   const { address, isConnected } = useAccount()
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
 
   return useQuery({
     queryKey: ['positions', address, chainId],

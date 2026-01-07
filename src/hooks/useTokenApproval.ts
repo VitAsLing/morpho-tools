@@ -1,18 +1,19 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useAccount, useWriteContract, useChainId } from 'wagmi'
+import { useAccount, useWriteContract } from 'wagmi'
 import { createPublicClient, http, type Address } from 'viem'
 import { ERC20_ABI } from '@/lib/morpho/abi'
 import { getMorphoAddress, getChain, getRpcUrl } from '@/lib/morpho/constants'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 
 export function useTokenApproval(tokenAddress: Address | undefined) {
   const { address } = useAccount()
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
   const morphoAddress = getMorphoAddress(chainId)
   const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>()
   const [approvalError, setApprovalError] = useState<string | undefined>()
   const [balance, setBalance] = useState<bigint>(0n)
   const [allowance, setAllowance] = useState<bigint>(0n)
-  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+  const [isConfirming, setIsConfirming] = useState(false)
 
   // 创建独立的 viem client 读取数据（避免 wagmi client 链不匹配的问题）
   const fetchDataFromChain = useCallback(async () => {
@@ -69,7 +70,7 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
     setAllowance(allowance)
   }, [fetchDataFromChain])
 
-  const { writeContractAsync, isPending: isApproving } = useWriteContract()
+  const { writeContractAsync, isPending: isSigning } = useWriteContract()
 
   const approve = useCallback(
     async (amount: bigint): Promise<`0x${string}` | undefined> => {
@@ -79,8 +80,10 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
       if (!chain) return undefined
 
       setApprovalError(undefined)
+      setApprovalHash(undefined)
 
       try {
+        // 阶段1: 等待钱包签名
         const hash = await writeContractAsync({
           address: tokenAddress,
           abi: ERC20_ABI,
@@ -89,27 +92,33 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
         })
 
         setApprovalHash(hash)
-        setIsWaitingForApproval(true)
+        setIsConfirming(true)
 
-        // 用独立的 viem client 等待交易确认
+        // 阶段2: 等待区块确认
         const client = createPublicClient({
           chain,
           transport: http(getRpcUrl(chainId)),
         })
-        await client.waitForTransactionReceipt({ hash })
-        setIsWaitingForApproval(false)
-        await refetchAllowance()
+        const receipt = await client.waitForTransactionReceipt({ hash })
+        setIsConfirming(false)
 
+        // 检查交易是否成功
+        if (receipt.status === 'reverted') {
+          setApprovalError('Transaction reverted')
+          throw new Error('Transaction reverted')
+        }
+
+        await refetchAllowance()
         return hash
       } catch (error) {
-        setIsWaitingForApproval(false)
+        setIsConfirming(false)
         const message = error instanceof Error ? error.message : 'Approval failed'
         // 用户取消不设置错误状态
         if (message.toLowerCase().includes('user rejected') || message.toLowerCase().includes('user denied')) {
           throw error
         }
         // 其他错误才设置错误状态
-        setApprovalError('Failed')
+        setApprovalError(message)
         throw error
       }
     },
@@ -129,7 +138,8 @@ export function useTokenApproval(tokenAddress: Address | undefined) {
     balance: balance ?? 0n,
     approve,
     needsApproval,
-    isApproving: isApproving || isWaitingForApproval,
+    isSigning,
+    isConfirming,
     approvalHash,
     approvalError,
     refetchAllowance,

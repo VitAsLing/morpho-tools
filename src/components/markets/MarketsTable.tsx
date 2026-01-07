@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useChainId } from 'wagmi'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 import type { Market, SortField, SortDirection } from '@/types'
 import { ApyDisplay } from './ApyDisplay'
 import { SupplyModal } from './SupplyModal'
@@ -30,7 +30,7 @@ const SORT_FIELD_KEY = 'morpho-tools-markets-sort-field'
 const SORT_DIRECTION_KEY = 'morpho-tools-markets-sort-direction'
 
 export function MarketsTable({ markets, isLoading, error }: MarketsTableProps) {
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
   const chainConfig = getChainConfig(chainId)
   const [sortField, setSortField] = useState<SortField>(() => {
     try {

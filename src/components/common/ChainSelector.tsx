@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { useChainId, useSwitchChain, useAccount } from 'wagmi'
+import { useSwitchChain, useAccount } from 'wagmi'
 import { mainnet, base, arbitrum } from 'wagmi/chains'
 import { Button } from '@/components/ui/button'
 import { hyperEvm } from '@/lib/morpho/constants'
-import { setStoredChainId, getStoredChainId } from '@/providers/Web3Provider'
+import { useSelectedChainId, useSetChainId } from '@/providers/ChainProvider'
 
 const chains = [mainnet, base, arbitrum, hyperEvm]
 
@@ -16,22 +16,12 @@ const chainLogos: Record<number, string> = {
 
 export function ChainSelector() {
   const { isConnected } = useAccount()
-  const connectedChainId = useChainId()
   const { switchChain } = useSwitchChain()
+  const chainId = useSelectedChainId()
+  const setChainId = useSetChainId()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [selectedChainId, setSelectedChainId] = useState(() => getStoredChainId())
 
-  // 钱包连接后，同步钱包的链到本地状态
-  useEffect(() => {
-    if (isConnected) {
-      setSelectedChainId(connectedChainId)
-      setStoredChainId(connectedChainId)
-    }
-  }, [isConnected, connectedChainId])
-
-  // 使用：已连接时用钱包链，未连接时用本地选择的链
-  const chainId = isConnected ? connectedChainId : selectedChainId
   const currentChain = chains.find((c) => c.id === chainId) || mainnet
 
   useEffect(() => {
@@ -80,9 +70,8 @@ export function ChainSelector() {
                     if (isConnected) {
                       await switchChain({ chainId: chain.id })
                     }
-                    // 无论是否连接，都保存选择
-                    setSelectedChainId(chain.id)
-                    setStoredChainId(chain.id)
+                    // 无论是否连接，都更新 context 状态
+                    setChainId(chain.id)
                   } catch (error) {
                     console.error('Failed to switch chain:', error)
                   }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useAccount, useChainId } from 'wagmi'
+import { useAccount } from 'wagmi'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 import type { EnrichedUserPosition } from '@/hooks/useUserPositions'
 import { ApyDisplay } from '../markets/ApyDisplay'
 import { WithdrawModal } from './WithdrawModal'
@@ -27,7 +28,7 @@ interface PositionsTableProps {
 
 export function PositionsTable({ positions, isLoading, error }: PositionsTableProps) {
   const { address } = useAccount()
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
   const chainConfig = getChainConfig(chainId)
   const [selectedPosition, setSelectedPosition] = useState<EnrichedUserPosition | null>(null)
 

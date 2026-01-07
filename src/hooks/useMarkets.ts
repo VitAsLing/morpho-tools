@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { useChainId } from 'wagmi'
+import { useSelectedChainId } from '@/providers/ChainProvider'
 import { fetchMarkets } from '@/lib/morpho/api'
 
 export function useMarkets() {
-  const chainId = useChainId()
+  const chainId = useSelectedChainId()
 
   return useQuery({
     queryKey: ['markets', chainId],
