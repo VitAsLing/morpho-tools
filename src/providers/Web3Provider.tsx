@@ -1,5 +1,5 @@
 import { WagmiProvider, http, fallback, createConfig } from 'wagmi'
-import { mainnet, base, arbitrum } from 'wagmi/chains'
+import { mainnet, base, arbitrum, hyperEvm } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit'
 import {
@@ -10,7 +10,7 @@ import {
 } from '@rainbow-me/rainbowkit/wallets'
 import type { ReactNode } from 'react'
 import '@rainbow-me/rainbowkit/styles.css'
-import { RPC_URLS, hyperEvm, CHAIN_MAP } from '@/lib/morpho/constants'
+import { RPC_URLS, CHAIN_MAP } from '@/lib/morpho/constants'
 import { ChainProvider } from './ChainProvider'
 
 const CHAIN_STORAGE_KEY = 'morpho-tools-chain'

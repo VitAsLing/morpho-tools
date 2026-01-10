@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSwitchChain, useAccount } from 'wagmi'
-import { mainnet, base, arbitrum } from 'wagmi/chains'
+import { mainnet, base, arbitrum, hyperEvm } from 'wagmi/chains'
 import { Button } from '@/components/ui/button'
-import { hyperEvm } from '@/lib/morpho/constants'
 import { useSelectedChainId, useSetChainId } from '@/providers/ChainProvider'
 
 const chains = [mainnet, base, arbitrum, hyperEvm]

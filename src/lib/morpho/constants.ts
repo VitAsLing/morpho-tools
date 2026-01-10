@@ -1,22 +1,9 @@
 import type { Address } from 'viem'
 import type { Chain } from 'viem'
-import { mainnet, base, arbitrum } from 'viem/chains'
+import { mainnet, base, arbitrum, hyperEvm } from 'viem/chains'
 import type { ChainConfig } from '@/types'
 
 export const MORPHO_GRAPHQL_API = 'https://blue-api.morpho.org/graphql'
-
-// HyperEVM chain 定义 (wagmi/viem 中可能没有)
-export const hyperEvm: Chain = {
-  id: 999,
-  name: 'HyperEVM',
-  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-  rpcUrls: {
-    default: { http: ['https://rpc.hyperliquid.xyz/evm'] },
-  },
-  blockExplorers: {
-    default: { name: 'HyperEVM Scan', url: 'https://hyperevmscan.io' },
-  },
-}
 
 // RPC URLs 配置 - 使用官方节点
 export const RPC_URLS: Record<number, string[]> = {
