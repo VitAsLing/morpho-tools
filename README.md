@@ -110,6 +110,10 @@ This project is configured for deployment on Cloudflare Pages.
 - **Merkl API** - Rewards data
 - **Public RPC Endpoints** - Blockchain interactions (Cloudflare, official chain RPCs)
 
+## Disclaimer
+
+This project is for informational purposes only. It is not financial advice. Use at your own risk. The authors are not responsible for any losses or damages.
+
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
