@@ -47,8 +47,8 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
   const parsedAmount = amount
     ? parseTokenAmount(amount, market.loanAsset.decimals)
     : 0n
-  const maxAssets = BigInt(position.supplyAssets)
-  const maxShares = BigInt(position.supplyShares)
+  const maxAssets = BigInt(position.state.supplyAssets)
+  const maxShares = BigInt(position.state.supplyShares)
 
   // 判断是否全额提取
   const isFullWithdraw = parsedAmount >= maxAssets
@@ -56,8 +56,8 @@ export function WithdrawModal({ position, onClose }: WithdrawModalProps) {
   const marketParams: MarketParams = {
     loanToken: market.loanAsset.address,
     collateralToken: market.collateralAsset?.address ?? '0x0000000000000000000000000000000000000000',
-    oracle: (market as { oracleAddress?: string }).oracleAddress as `0x${string}` || '0x0000000000000000000000000000000000000000',
-    irm: (market as { irmAddress?: string }).irmAddress as `0x${string}` || '0x0000000000000000000000000000000000000000',
+    oracle: market.oracle.address,
+    irm: market.irmAddress,
     lltv: BigInt((market as { lltv?: string }).lltv || 0),
   }
 

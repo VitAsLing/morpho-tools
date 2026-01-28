@@ -47,7 +47,9 @@ const GET_MARKETS_QUERY = gql`
             }
           }
         }
-        oracleAddress
+        oracle {
+          address
+        }
         irmAddress
       }
     }
@@ -93,12 +95,16 @@ const GET_USER_POSITIONS_QUERY = gql`
               }
             }
           }
-          oracleAddress
+          oracle {
+            address
+          }
           irmAddress
           lltv
         }
-        supplyAssets
-        supplyShares
+        state {
+          supplyAssets
+          supplyShares
+        }
       }
     }
   }

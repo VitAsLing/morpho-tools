@@ -80,9 +80,9 @@ export function PositionsTable({ positions, isLoading, error }: PositionsTablePr
             ) : (
               positions.map((position) => {
                 const market = position.market
-                const currentTokens = BigInt(position.supplyAssets)
+                const currentTokens = BigInt(position.state.supplyAssets)
                 const supplyAmount = formatTokenAmount(currentTokens, market.loanAsset.decimals)
-                const valueUsd = calculateUsdValue(position.supplyAssets, market.loanAsset.decimals, market.loanAsset.priceUsd)
+                const valueUsd = calculateUsdValue(position.state.supplyAssets, market.loanAsset.decimals, market.loanAsset.priceUsd)
 
                 // 优先使用 API 交易数据计算，否则回退到本地存储
                 const apiProfitData = position.profitData

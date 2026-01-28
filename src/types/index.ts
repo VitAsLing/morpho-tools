@@ -35,7 +35,9 @@ export interface Market {
   loanAsset: Token
   collateralAsset: Token | null
   state: MarketState
-  oracleAddress: Address
+  oracle: {
+    address: Address
+  }
   irmAddress: Address
 }
 
@@ -59,9 +61,15 @@ export interface UserPosition {
       utilization: number
       rewards: RewardInfo[]
     }
+    oracle: {
+      address: Address
+    }
+    irmAddress: Address
   }
-  supplyAssets: bigint
-  supplyShares: bigint
+  state: {
+    supplyAssets: bigint
+    supplyShares: bigint
+  }
 }
 
 export interface ChainConfig {

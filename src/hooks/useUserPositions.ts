@@ -27,7 +27,7 @@ export function useUserPositions() {
       // 计算每个 position 的 profit 数据
       return positions.map((pos) => {
         // 当前持仓 token 数量
-        const currentTokens = BigInt(pos.supplyAssets)
+        const currentTokens = BigInt(pos.state.supplyAssets)
 
         // 从交易记录计算 profit (token 计价)
         const profitData = calculatePositionProfit(transactions, pos.market.uniqueKey, currentTokens)

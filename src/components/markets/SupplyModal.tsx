@@ -69,7 +69,7 @@ export function SupplyModal({ market, onClose }: SupplyModalProps) {
   const marketParams: MarketParams = {
     loanToken: market.loanAsset.address,
     collateralToken: market.collateralAsset?.address ?? '0x0000000000000000000000000000000000000000',
-    oracle: market.oracleAddress,
+    oracle: market.oracle.address,
     irm: market.irmAddress,
     lltv: BigInt(market.lltv),
   }
