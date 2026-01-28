@@ -3,7 +3,7 @@ import type { Chain } from 'viem'
 import { mainnet, base, arbitrum, hyperEvm } from 'viem/chains'
 import type { ChainConfig } from '@/types'
 
-export const MORPHO_GRAPHQL_API = 'https://blue-api.morpho.org/graphql'
+export const MORPHO_GRAPHQL_API = 'https://api.morpho.org/graphql'
 
 // RPC URLs 配置 - 使用官方节点
 export const RPC_URLS: Record<number, string[]> = {
